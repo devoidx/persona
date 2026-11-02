@@ -113,6 +113,11 @@ function ns.Refresh()
   add(("Jumps: %s total, %s while travelling%s"):format(BreakUpLargeNumbers(db.totalJumps),
     BreakUpLargeNumbers(db.travelJumps),
     travelMin >= 1 and (" (%.1f/min)"):format(db.travelJumps / travelMin) or ""))
+  if (db.emoteTotal or 0) > 0 then
+    local fav = T.TopN(db.emotes, 1)[1]
+    add(("Emotes: %s (favourite: /%s, %s times)"):format(BreakUpLargeNumbers(db.emoteTotal),
+      fav.k:lower(), BreakUpLargeNumbers(fav.v)))
+  end
   add(("Ground travel: %s (%s on foot)"):format(T.FmtTime(db.travel), T.FmtTime(db.onFoot)))
   add(("Idle in towns: %s"):format(T.FmtTime(db.idleResting)))
   add(("Falls: %d, ~%s yd est., longest %.1fs"):format(db.falls,

@@ -37,6 +37,9 @@ local DEFAULTS = {
   falls = 0,
   longestFall = 0,
   fallYards = 0,             -- estimated
+  emotes = {},               -- [TOKEN] = times performed, e.g. DANCE, BOW
+  emoteTotal = 0,
+  soloDances = 0,            -- /dance with no target while not grouped
   hours = {},                -- [0-23] = seconds played in that local hour
   days = {},                 -- [0-6, Sunday = 0] = seconds played on that weekday
   played = false,            -- /played total, seconds
@@ -197,6 +200,31 @@ local function onJump()
 end
 
 ---------------------------------------------------------------------------
+-- Emote counting by token (DANCE, BOW...), so it works in every client language.
+-- 12.0 replaced DoEmote with C_ChatInfo.PerformEmote and kept DoEmote as a
+-- deprecated alias. Both are hooked; if one calls the other, the second
+-- sighting of the same token in the same frame is dropped.
+---------------------------------------------------------------------------
+local lastEmoteToken, lastEmoteTime
+local function onEmote(token)
+  if not db or type(token) ~= "string" or isSecret(token) then return end
+  token = token:upper()
+  local now = GetTime()
+  if token == lastEmoteToken and now == lastEmoteTime then return end
+  lastEmoteToken, lastEmoteTime = token, now
+
+  db.emotes[token] = (db.emotes[token] or 0) + 1
+  db.emoteTotal = db.emoteTotal + 1
+
+  if token == "DANCE" then
+    local hasTarget = UnitExists("target")
+    if not isSecret(hasTarget) and not hasTarget and not IsInGroup() then
+      db.soloDances = db.soloDances + 1
+    end
+  end
+end
+
+---------------------------------------------------------------------------
 -- Events
 ---------------------------------------------------------------------------
 Core:RegisterEvent("ADDON_LOADED")
@@ -216,6 +244,8 @@ Core:SetScript("OnEvent", function(self, event, arg1, ...)
     db.sessions = db.sessions + 1
     ns.db = db
     if JumpOrAscendStart then hooksecurefunc("JumpOrAscendStart", onJump) end
+    if C_ChatInfo and C_ChatInfo.PerformEmote then hooksecurefunc(C_ChatInfo, "PerformEmote", onEmote) end
+    if DoEmote then hooksecurefunc("DoEmote", onEmote) end
     self:UnregisterEvent("ADDON_LOADED")
     if ns.OnDBReady then ns.OnDBReady(db) end
   elseif event == "PLAYER_ENTERING_WORLD" then

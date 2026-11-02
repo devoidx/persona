@@ -21,9 +21,16 @@ chunk(open(sys.argv[1]).read(), ns)
 db = lua.eval('''{ tracked=5*3600, travel=40*60, onFoot=30*60, travelJumps=40*14, totalJumps=900,
   mounted=60*60, mounts={[42]=50*60,[7]=10*60}, zones={["Silvermoon City - The Bazaar"]=3000, ["Eversong"]=200},
   idleResting=5*3600*0.3, idleZones={["Silvermoon City"]=4000}, fallYards=3500, longestFall=7.2,
-  hours={[1]=5*3600*0.4,[21]=5*3600*0.6}, days={[0]=4*3600,[3]=3600} }''')
+  hours={[1]=5*3600*0.4,[21]=5*3600*0.6}, days={[0]=4*3600,[3]=3600},
+  emotes={DANCE=60, BOW=30, THANK=15, WAVE=5}, emoteTotal=110, soloDances=50 }''')
 traits = ns.traits.Build(db)
 print("TITLE:", ns.traits.Headline(traits))
 for i in range(1, len(traits)+1):
     t = traits[i]; print(f"{t.score:5.2f}  {t.label}: {t.text}")
 print("EMPTY:", ns.traits.EmptyText(lua.eval('{tracked=300}')))
+
+labels = [traits[i].label for i in range(1, len(traits)+1)]
+for want in ("Dancer", "Polite", "Dances Alone"):
+    assert want in labels, f"{want} should fire: {labels}"
+assert "Signature Move" not in labels, "Dancer replaces Signature Move when the top emote is /dance"
+print("ok: emote traits")

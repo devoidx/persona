@@ -1,5 +1,9 @@
 # Persona
 
+## v0.5.0
+- Persona now notices your emotes: Signature Move, Dancer, Polite, Rude and Dances Alone.
+- New trait: Stone-Faced, for long-played characters who have never used /lol.
+
 ## v0.4.2
 - Full release.
 

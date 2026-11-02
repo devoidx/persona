@@ -303,6 +303,56 @@ local COPY = {
       "{n} tiny violin performances. {name} has heard your complaint.",
     },
   },
+  stoneface = {
+    label = "Stone-Faced",
+    epithet = "{name} the Unamused",
+    lines = {
+      "{n} hours played, and {name} has never once /lol'd.",
+      "{name} has seen everything Azeroth has to offer in {n} hours. None of it was funny.",
+      "{n} hours. Not a single laugh. {name} is a tough crowd.",
+    },
+  },
+  -- Emotes (counted since install)
+  signature = {
+    label = "Signature Move",
+    epithet = "{name}, Master of {emote}",
+    lines = {
+      "{name}'s signature move is {emote}, used {n} times and counting.",
+      "Ask {name} anything. The answer is usually {emote} ({n} times so far).",
+    },
+  },
+  dancer = {
+    label = "Dancer",
+    epithet = "{name} the Dancer",
+    lines = {
+      "{name} has danced {n} times. That's {p}% of every emote {name} makes.",
+      "When in doubt, {name} dances. {n} times and counting.",
+    },
+  },
+  polite = {
+    label = "Polite",
+    epithet = "{name} the Courteous",
+    lines = {
+      "{p}% of {name}'s emotes are bows, thanks and salutes. Somebody raised {name} well.",
+      "{name} is unfailingly polite: {p}% of all emotes are courtesies.",
+    },
+  },
+  rude = {
+    label = "Rude",
+    epithet = "{name} the Insufferable",
+    lines = {
+      "{p}% of {name}'s emotes are rude. The innkeepers have been warned.",
+      "{name} communicates mainly in rude gestures: {p}% of all emotes.",
+    },
+  },
+  solodancer = {
+    label = "Dances Alone",
+    epithet = "{name}, Who Dances Alone",
+    lines = {
+      "{name} has danced alone {n} times. No target, no group, no audience.",
+      "{n} solo dances. {name} doesn't need anyone else to have a good time.",
+    },
+  },
   -- When they play
   nightowl = {
     label = "Night Owl",
@@ -329,6 +379,11 @@ local COPY = {
     },
   },
 }
+
+-- Emote groups for the Polite and Rude traits (tokens as the game names them)
+local POLITE = { "BOW", "THANK", "SALUTE", "CURTSEY", "KNEEL", "WELCOME", "GREET", "APPLAUD" }
+local RUDE = { "RUDE", "SPIT", "CHICKEN", "TAUNT", "GLOAT", "MOCK", "INSULT", "FART" }
+T.EMOTE_MIN = 30   -- emotes needed before emote traits can appear
 
 -- Hour labels for the evidence list
 function T.HourRange(h)
@@ -396,6 +451,41 @@ function T.Build(db)
   lifetime("friendly", T.Stat("waves"), 100, {})
   lifetime("cheerleader", T.Stat("cheers"), 100, {})
   lifetime("sardonic", T.Stat("violins"), 25, {})
+
+  -- An absence can be a trait too: never laughing in hundreds of hours is a choice.
+  -- Needs /played (requested when the panel opens) and a statistic that was found:
+  -- nil means "not found on this client", 0 means "found, never used".
+  local STONE_HOURS = 500
+  local lols = T.Stat("lols")
+  if lols == 0 and db.played and db.played >= STONE_HOURS * 3600 then
+    local hours = math.floor(db.played / 3600)
+    add("stoneface", damp(hours / STONE_HOURS), { n = BreakUpLargeNumbers(hours) }, true)
+  end
+
+  -- Emotes: gated on how many have been seen, not on time played
+  local emotes, emoteTotal = db.emotes or {}, db.emoteTotal or 0
+  if emoteTotal >= T.EMOTE_MIN then
+    local tok, n = top(emotes)
+    local share = n / emoteTotal
+    if tok == "DANCE" and share >= 0.35 then
+      add("dancer", share / 0.35, { n = BreakUpLargeNumbers(n), p = pct(share) })
+    elseif tok and n >= 15 and share >= 0.25 then
+      add("signature", share / 0.25, { emote = "/" .. tok:lower(), n = BreakUpLargeNumbers(n) })
+    end
+    local function groupShare(list)
+      local sum = 0
+      for _, t in ipairs(list) do sum = sum + (emotes[t] or 0) end
+      return sum / emoteTotal
+    end
+    local polite, rude = groupShare(POLITE), groupShare(RUDE)
+    if polite >= 0.4 then add("polite", polite / 0.4, { p = pct(polite) }) end
+    if rude >= 0.3 then add("rude", rude / 0.3, { p = pct(rude) }) end
+  end
+  local solo, dances = db.soloDances or 0, emotes.DANCE or 0
+  if solo >= 25 and dances > 0 and solo / dances >= 0.7 then
+    -- A count that only grows: damp it so it can't hold the title forever
+    add("solodancer", 1 + 0.25 * math.log(solo / 25), { n = BreakUpLargeNumbers(solo) })
+  end
 
   if db.tracked >= T.MIN_TRACKED then
     -- When they play
