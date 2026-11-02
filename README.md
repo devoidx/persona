@@ -22,6 +22,9 @@ Everything is stored per character in `PersonaDB`. No combat data is read, so it
 
 - `/persona`: toggle the panel
 - `/persona stats`: list which lifetime statistics this client provides
+- `/persona dock`: put the panel back beside the character frame after moving it
+
+Drag the panel to move it. Once moved it opens where you left it, and stays open when the character frame closes.
 - `/persona reset`: wipe this character's data
 
 ## Releasing

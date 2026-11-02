@@ -1,6 +1,8 @@
 -- Persona: panel docked to the right of the character frame.
 -- Parented to UIParent and only anchored to CharacterFrame, rather than
 -- injected as a real tab, to stay clear of Blizzard's panel layout and taint.
+-- Dragging the panel undocks it: it then opens where it was left until
+-- "/persona dock" puts it back beside the character frame.
 
 local _, ns = ...
 local T = ns.traits
@@ -23,6 +25,22 @@ local function build()
   panel:SetBackdropColor(0.04, 0.04, 0.07, 0.95)
   panel:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
   panel:Hide()
+
+  -- Drag to move. The position is saved by us (in PersonaDB), not by the
+  -- client's layout cache, so the docked default isn't overridden behind our back.
+  panel:SetMovable(true)
+  panel:SetClampedToScreen(true)
+  panel:EnableMouse(true)
+  panel:RegisterForDrag("LeftButton")
+  if panel.SetDontSavePosition then panel:SetDontSavePosition(true) end
+  panel:SetScript("OnDragStart", function(self) self:StartMoving() end)
+  panel:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+    local point, _, relPoint, x, y = self:GetPoint(1)
+    if ns.db and point then
+      ns.db.panelPos = { point = point, relPoint = relPoint, x = x, y = y }
+    end
+  end)
 
   title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
   title:SetPoint("TOPLEFT", PAD, -PAD)
@@ -55,13 +73,19 @@ local function build()
     CharacterFrame:HookScript("OnShow", function()
       if ns.db and ns.db.panelOpen then ns.SetPanel(true, true) end
     end)
-    CharacterFrame:HookScript("OnHide", function() panel:Hide() end)
+    -- Only a docked panel closes with the character frame; a moved one stays put
+    CharacterFrame:HookScript("OnHide", function()
+      if not (ns.db and ns.db.panelPos) then panel:Hide() end
+    end)
   end
 end
 
 local function anchor()
   panel:ClearAllPoints()
-  if CharacterFrame and CharacterFrame:IsShown() then
+  local pos = ns.db and ns.db.panelPos
+  if pos then
+    panel:SetPoint(pos.point, UIParent, pos.relPoint, pos.x, pos.y)
+  elseif CharacterFrame and CharacterFrame:IsShown() then
     panel:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", 4, 0)
   else
     panel:SetPoint("CENTER")
@@ -193,8 +217,14 @@ SlashCmdList.PERSONA = function(msg)
   if msg == "stats" then
     print("|cff66ccffPersona|r: lifetime statistics on this client:")
     T.DumpStats()
+  elseif msg == "dock" then
+    if ns.db then ns.db.panelPos = nil end
+    print("|cff66ccffPersona|r: panel docked beside the character frame again.")
+    if panel and panel:IsShown() then anchor() end
   elseif msg == "reset" then
+    local pos = ns.db and ns.db.panelPos
     ns.ResetDB()
+    if ns.db then ns.db.panelPos = pos end   -- resetting the profile keeps the window where it is
     print("|cff66ccffPersona|r: data reset for this character.")
     ns.Refresh()
   else
