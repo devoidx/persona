@@ -1,0 +1,4 @@
+# Persona
+
+## v0.4.0
+- First public release.

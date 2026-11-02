@@ -1,0 +1,45 @@
+name: Release AddOn
+
+# Tag push (e.g. v0.4.1-beta): test, package, upload to CurseForge.
+# Manual run (Actions tab or `gh workflow run`): test and package only, no upload.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Smoke test trait builder
+        run: |
+          pip install --quiet lupa
+          python -I tests/smoke_retail.py Traits.lua
+          python -I tests/smoke_forever.py Traits.lua
+          python -I tests/smoke_veteran.py Traits.lua
+
+      - uses: BigWigsMods/packager@v2
+        with:
+          args: ${{ github.event_name == 'workflow_dispatch' && '-d' || '' }}
+
+      - name: Keep the dry-run zip
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: persona-dry-run
+          path: .release/*.zip

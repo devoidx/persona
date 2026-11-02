@@ -1,0 +1,245 @@
+-- Persona: Core sampling engine
+-- Samples cheap player-state APIs on a throttled OnUpdate and accumulates
+-- per-character totals into PersonaDB (written by the client on logout/reload).
+
+local ADDON, ns = ...
+
+-- WoW Forever runs as its own game type ("camelot") on the modern client.
+ns.IS_FOREVER = WOW_PROJECT_CAMELOT ~= nil and WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
+local Core = CreateFrame("Frame")
+ns.core = Core
+
+local SAMPLE = 0.25          -- seconds between samples
+local MOUNT_RESCAN = 10      -- fallback mount rescan interval while mounted
+local MIN_FALL = 1.0         -- ignore falls shorter than this (normal jump arcs)
+
+-- Free-fall model for estimating distance from fall duration. These are
+-- community-measured approximations, not values the client exposes.
+local GRAVITY = 19.29        -- yards/s^2
+local TERMINAL = 60.15       -- yards/s
+local T_TERMINAL = TERMINAL / GRAVITY
+
+local DEFAULTS = {
+  version = 1,
+  created = false,
+  tracked = 0,               -- seconds observed by the addon
+  sessions = 0,
+  travel = 0,                -- seconds moving on the ground (on foot or mounted)
+  onFoot = 0,                -- seconds moving on the ground, not mounted
+  travelJumps = 0,           -- jumps made while moving
+  totalJumps = 0,
+  mounted = 0,               -- seconds mounted with a known mount
+  mounts = {},               -- [mountID] = seconds
+  zones = {},                -- ["Zone - Subzone"] = seconds
+  idleResting = 0,           -- seconds stationary in a resting area (cities/inns)
+  idleZones = {},            -- [zone] = seconds stationary while resting
+  falling = 0,               -- seconds in qualifying falls
+  falls = 0,
+  longestFall = 0,
+  fallYards = 0,             -- estimated
+  hours = {},                -- [0-23] = seconds played in that local hour
+  days = {},                 -- [0-6, Sunday = 0] = seconds played on that weekday
+  played = false,            -- /played total, seconds
+  playedAt = false,
+  panelOpen = false,
+}
+
+-- Midnight secret values: never do arithmetic on something the client has hidden.
+local function isSecret(v)
+  return issecretvalue ~= nil and issecretvalue(v)
+end
+
+local function safeSpeed()
+  local s = GetUnitSpeed("player")
+  if s == nil or isSecret(s) then return nil end
+  return s
+end
+
+local function applyDefaults(db)
+  for k, v in pairs(DEFAULTS) do
+    if db[k] == nil then
+      db[k] = (type(v) == "table") and {} or v
+    end
+  end
+end
+
+local function bump(tbl, key, dt)
+  if key == nil or key == "" then return end
+  tbl[key] = (tbl[key] or 0) + dt
+end
+
+function ns.EstimateFallYards(t)
+  if t <= T_TERMINAL then
+    return 0.5 * GRAVITY * t * t
+  end
+  return 0.5 * GRAVITY * T_TERMINAL * T_TERMINAL + TERMINAL * (t - T_TERMINAL)
+end
+
+---------------------------------------------------------------------------
+-- Cached state (updated by events, read by the sampler)
+---------------------------------------------------------------------------
+local db
+local zoneKey, zoneName = nil, nil
+local currentMount, lastMountScan = nil, 0
+local fallStart = nil
+local clockHour, clockDay, clockCheck = nil, nil, 0
+
+local function updateZone()
+  zoneName = GetRealZoneText() or ""
+  local sub = GetSubZoneText() or ""
+  if sub ~= "" and sub ~= zoneName then
+    zoneKey = zoneName .. " - " .. sub
+  else
+    zoneKey = zoneName
+  end
+end
+
+local function scanMount()
+  currentMount = nil
+  lastMountScan = GetTime()
+  if not IsMounted() then return end
+  -- Guard: don't assume every client flavour ships the mount journal
+  if not (C_MountJournal and C_MountJournal.GetMountIDs) then return end
+  local ids = C_MountJournal.GetMountIDs() or {}
+  for i = 1, #ids do
+    local _, _, _, isActive = C_MountJournal.GetMountInfoByID(ids[i])
+    if isActive then
+      currentMount = ids[i]
+      return
+    end
+  end
+end
+
+local function isGliding()
+  if C_PlayerInfo and C_PlayerInfo.GetGlidingInfo then
+    local gliding = C_PlayerInfo.GetGlidingInfo()
+    return gliding and not isSecret(gliding)
+  end
+  return false
+end
+
+local function finishFall(now)
+  if not fallStart then return end
+  local dur = now - fallStart
+  fallStart = nil
+  if dur < MIN_FALL then return end
+  db.falls = db.falls + 1
+  db.falling = db.falling + dur
+  db.fallYards = db.fallYards + ns.EstimateFallYards(dur)
+  if dur > db.longestFall then db.longestFall = dur end
+end
+
+---------------------------------------------------------------------------
+-- Sampler
+---------------------------------------------------------------------------
+local acc = 0
+local function onUpdate(_, elapsed)
+  acc = acc + elapsed
+  if acc < SAMPLE then return end
+  local dt = acc
+  acc = 0
+  if not db then return end
+
+  local now = GetTime()
+  db.tracked = db.tracked + dt
+  bump(db.zones, zoneKey, dt)
+
+  -- Local clock: refresh at most once a minute
+  if now - clockCheck >= 60 or not clockHour then
+    clockCheck = now
+    clockHour, clockDay = tonumber(date("%H")), tonumber(date("%w"))
+  end
+  bump(db.hours, clockHour, dt)
+  bump(db.days, clockDay, dt)
+
+  local flying, swimming = IsFlying(), IsSwimming()
+  local mounted = IsMounted()
+  local speed = safeSpeed()
+
+  -- Mount time
+  if mounted then
+    if not currentMount and now - lastMountScan > MOUNT_RESCAN then scanMount() end
+    if currentMount then
+      db.mounted = db.mounted + dt
+      bump(db.mounts, currentMount, dt)
+    end
+  end
+
+  -- Ground travel
+  if speed and speed > 0 and not flying and not swimming then
+    db.travel = db.travel + dt
+    if not mounted then db.onFoot = db.onFoot + dt end
+  end
+
+  -- Idle in resting areas (cities and inns)
+  if speed == 0 and IsResting() and not UnitAffectingCombat("player") then
+    db.idleResting = db.idleResting + dt
+    bump(db.idleZones, zoneName, dt)
+  end
+
+  -- Falls (excludes flying, swimming and skyriding glides)
+  if IsFalling() and not flying and not swimming and not isGliding() then
+    if not fallStart then fallStart = now - dt end
+  elseif fallStart then
+    finishFall(now)
+  end
+end
+
+---------------------------------------------------------------------------
+-- Jump counting: JumpOrAscendStart is what the jump keybinding calls.
+-- hooksecurefunc runs after it and does not taint it.
+---------------------------------------------------------------------------
+local function onJump()
+  if not db or IsSwimming() or IsFlying() then return end
+  db.totalJumps = db.totalJumps + 1
+  local s = safeSpeed()
+  if s and s > 0 then db.travelJumps = db.travelJumps + 1 end
+end
+
+---------------------------------------------------------------------------
+-- Events
+---------------------------------------------------------------------------
+Core:RegisterEvent("ADDON_LOADED")
+Core:RegisterEvent("PLAYER_ENTERING_WORLD")
+Core:RegisterEvent("ZONE_CHANGED")
+Core:RegisterEvent("ZONE_CHANGED_INDOORS")
+Core:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+Core:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
+Core:RegisterEvent("TIME_PLAYED_MSG")
+
+Core:SetScript("OnEvent", function(self, event, arg1, ...)
+  if event == "ADDON_LOADED" and arg1 == ADDON then
+    PersonaDB = PersonaDB or {}
+    db = PersonaDB
+    applyDefaults(db)
+    if not db.created then db.created = time() end
+    db.sessions = db.sessions + 1
+    ns.db = db
+    if JumpOrAscendStart then hooksecurefunc("JumpOrAscendStart", onJump) end
+    self:UnregisterEvent("ADDON_LOADED")
+    if ns.OnDBReady then ns.OnDBReady(db) end
+  elseif event == "PLAYER_ENTERING_WORLD" then
+    updateZone()
+    scanMount()
+    fallStart = nil
+    self:SetScript("OnUpdate", onUpdate)
+  elseif event == "PLAYER_MOUNT_DISPLAY_CHANGED" then
+    scanMount()
+  elseif event == "TIME_PLAYED_MSG" then
+    if db and arg1 and not isSecret(arg1) then
+      db.played = arg1
+      db.playedAt = time()
+      if ns.Refresh then ns.Refresh() end
+    end
+  else -- zone events
+    updateZone()
+  end
+end)
+
+function ns.ResetDB()
+  if not db then return end
+  wipe(db)
+  applyDefaults(db)
+  db.created = time()
+  db.sessions = 1
+end

@@ -1,0 +1,12 @@
+package-as: Persona
+
+# Development files that should not ship in the addon zip
+ignore:
+  - tests
+  - README.md
+  - CURSEFORGE.md
+  - media
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
