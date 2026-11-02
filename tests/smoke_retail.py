@@ -34,3 +34,16 @@ for want in ("Dancer", "Polite", "Dances Alone"):
     assert want in labels, f"{want} should fire: {labels}"
 assert "Signature Move" not in labels, "Dancer replaces Signature Move when the top emote is /dance"
 print("ok: emote traits")
+
+import re
+seen = set()
+for day in range(1, 22):
+    lua.execute(f'date = function(fmt) if fmt == "%Y-%m-%d" then return "2026-11-{day:02d}" end return os.date(fmt) end')
+    tr = ns.traits.Build(db)
+    for i in range(1, len(tr) + 1):
+        text = tr[i].text
+        seen.add(text)
+        assert "{" not in text, f"unfilled placeholder: {text}"
+        assert len(re.findall(r"minute", text)) <= 1, f"unit repeated: {text}"
+        assert "Consent" not in text
+print(f"ok: {len(seen)} phrasings rendered cleanly")

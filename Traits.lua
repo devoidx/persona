@@ -152,9 +152,9 @@ local COPY = {
     label = "Restless",
     epithet = "{name} the Restless",
     lines = {
-      "{name} cannot walk anywhere without bouncing. {n} jumps a minute on the road, every minute.",
+      "{name} cannot walk anywhere without bouncing: {n} jumps a minute on the road.",
       "Somewhere, a physics engine is tired. {name} jumps {n} times a minute while travelling.",
-      "{name} treats every road as a trampoline: {n} jumps per minute and counting.",
+      "{name} treats every road as a trampoline. {n} jumps a minute, and no sign of stopping.",
     },
   },
   grounded = {
@@ -179,7 +179,7 @@ local COPY = {
     epithet = "{name} the Homebody",
     lines = {
       "{name} has a favourite spot: {place}. {p}% of {his} life happens there.",
-      "Home is wherever {name} logs in, and that's {place}, {p}% of the time.",
+      "{name} keeps coming back to {place}: {p}% of all {his} time is spent there.",
     },
   },
   wanderer = {
@@ -243,7 +243,7 @@ local COPY = {
     label = "Commitment Issues",
     epithet = "{name} the Undecided",
     lines = {
-      "{name} has abandoned {n} quests. That's {p}% of everything {name} ever agreed to do.",
+      "{name} has abandoned {n} quests, {p}% of every quest {his} journal has ever held.",
       "{n} quests abandoned. {name} prefers to keep {his} options open.",
     },
   },
@@ -251,7 +251,7 @@ local COPY = {
     label = "Menace to Wildlife",
     epithet = "{name}, Bane of Squirrels",
     lines = {
-      "{n} critters have died at {name}'s hands. The rabbits have a name for {name}.",
+      "{n} critters have died at {name}'s hands. The rabbits speak of {name} only in whispers.",
       "{name} has killed {n} critters. None of them were a threat.",
     },
   },
@@ -259,7 +259,7 @@ local COPY = {
     label = "The Hugger",
     epithet = "{name} the Warm",
     lines = {
-      "{name} has hugged {n} times. Consent is assumed.",
+      "{name} has hugged {n} times. Nobody is safe.",
       "{n} hugs given. {name} is a lot, but in a nice way.",
     },
   },
@@ -292,7 +292,7 @@ local COPY = {
     epithet = "{name} the Encouraging",
     lines = {
       "{name} has cheered {n} times. Every win counts, apparently.",
-      "{n} cheers on record. {name} is {his} guild's biggest fan.",
+      "{n} cheers on record. {name} is everyone's biggest fan.",
     },
   },
   sardonic = {
@@ -325,7 +325,7 @@ local COPY = {
     label = "Dancer",
     epithet = "{name} the Dancer",
     lines = {
-      "{name} has danced {n} times. That's {p}% of every emote {name} makes.",
+      "{name} has danced {n} times, {p}% of all {his} emotes.",
       "When in doubt, {name} dances. {n} times and counting.",
     },
   },
