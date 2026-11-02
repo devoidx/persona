@@ -14,11 +14,14 @@ local function build()
   panel:SetWidth(WIDTH)
   panel:SetFrameStrata("HIGH")
   panel:SetBackdrop({
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
+    bgFile = "Interface\\Buttons\\WHITE8X8",
     edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true, tileSize = 16, edgeSize = 16,
+    tile = false, edgeSize = 16,
     insets = { left = 4, right = 4, top = 4, bottom = 4 },
   })
+  -- Near-opaque so other addons' text can't bleed through
+  panel:SetBackdropColor(0.04, 0.04, 0.07, 0.95)
+  panel:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
   panel:Hide()
 
   title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -75,8 +78,9 @@ function ns.Refresh()
   -- Coverage: be upfront that this only knows what it has seen.
   if db.played then
     local share = db.played > 0 and math.min(1, db.tracked / db.played) or 0
-    add(("%sObserved %s of %s played (%d%%)|r"):format(grey, T.FmtTime(db.tracked), T.FmtTime(db.played),
-      math.floor(share * 100 + 0.5)))
+    -- Veteran characters will sit under 1% for a long time; say so plainly
+    local shown = share < 0.01 and "since install" or ("%d%% of your playtime"):format(math.floor(share * 100 + 0.5))
+    add(("%sWatching for %s (%s)|r"):format(grey, T.FmtTime(db.tracked), shown))
   else
     add(("%sObserved %s since install|r"):format(grey, T.FmtTime(db.tracked)))
   end

@@ -9,6 +9,9 @@ local T = {}
 ns.traits = T
 
 T.MIN_TRACKED = 20 * 60
+-- Where and when someone plays needs several sessions before it says anything:
+-- one evening in one zone is a session, not a personality.
+T.MIN_PATTERN = 3 * 3600
 
 ---------------------------------------------------------------------------
 -- Helpers
@@ -173,7 +176,7 @@ local COPY = {
   },
   homebody = {
     label = "Homebody",
-    epithet = "{name} of {place}",
+    epithet = "{name} the Homebody",
     lines = {
       "{name} has a favourite spot: {place}. {p}% of {his} life happens there.",
       "Home is wherever {name} logs in, and that's {place}, {p}% of the time.",
@@ -399,10 +402,11 @@ function T.Build(db)
     local night = sumRange(db.hours, 0, 4) / db.tracked
     local morning = sumRange(db.hours, 5, 8) / db.tracked
     local weekend = ((db.days[0] or 0) + (db.days[6] or 0)) / db.tracked
-    if night >= 0.3 then add("nightowl", night / 0.3, { p = pct(night) }) end
-    if morning >= 0.3 then add("earlybird", morning / 0.3, { p = pct(morning) }) end
+    local patterns = db.tracked >= T.MIN_PATTERN
+    if patterns and night >= 0.3 then add("nightowl", night / 0.3, { p = pct(night) }) end
+    if patterns and morning >= 0.3 then add("earlybird", morning / 0.3, { p = pct(morning) }) end
     -- Weekends are 2/7 (29%) of the week, so 60% is a real lean, not chance
-    if weekend >= 0.6 and db.tracked >= 3 * 3600 then
+    if patterns and weekend >= 0.6 then
       add("weekender", weekend / 0.6, { p = pct(weekend) })
     end
 
@@ -426,7 +430,7 @@ function T.Build(db)
 
     -- Favourite haunt / wanderer
     local spot, spotT = top(db.zones)
-    if spot and spotT / db.tracked >= 0.2 then
+    if spot and db.tracked >= T.MIN_PATTERN and spotT / db.tracked >= 0.2 then
       local share = spotT / db.tracked
       add("homebody", share / 0.2, { p = pct(share), place = placeName(spot) })
     end
