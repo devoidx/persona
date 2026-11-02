@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CF_API_KEY: ${{ secrets.CF_API_KEY }}
       GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
@@ -43,3 +43,4 @@ jobs:
         with:
           name: persona-dry-run
           path: .release/*.zip
+          include-hidden-files: true
