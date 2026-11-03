@@ -204,9 +204,15 @@ end
 -- 12.0 replaced DoEmote with C_ChatInfo.PerformEmote and kept DoEmote as a
 -- deprecated alias. Both are hooked; if one calls the other, the second
 -- sighting of the same token in the same frame is dropped.
+--
+-- The game also performs emotes by itself: opening the world map or a mailbox
+-- plays READ via PerformEmote("READ", nil, true). Those automatic calls pass
+-- suppressMoveError = true; typed slash emotes and the emote menu never do,
+-- so that argument is what separates the player's emotes from the UI's.
 ---------------------------------------------------------------------------
 local lastEmoteToken, lastEmoteTime
-local function onEmote(token)
+local function onEmote(token, _, suppressMoveError)
+  if suppressMoveError then return end
   if not db or type(token) ~= "string" or isSecret(token) then return end
   token = token:upper()
   local now = GetTime()
@@ -222,6 +228,25 @@ local function onEmote(token)
       db.soloDances = db.soloDances + 1
     end
   end
+end
+
+---------------------------------------------------------------------------
+-- Saved-data upgrades, run once per character at load.
+---------------------------------------------------------------------------
+function ns.migrate(d)
+  local v = d.version or 1
+  if v < 2 then
+    -- 0.5.0 counted the world map and mailbox opening as /read. Those can't be
+    -- told apart from real ones after the fact, and a real /read is rare, so
+    -- drop READ entirely.
+    local bogus = d.emotes and d.emotes.READ or 0
+    if bogus > 0 then
+      d.emotes.READ = nil
+      d.emoteTotal = math.max(0, (d.emoteTotal or 0) - bogus)
+    end
+    v = 2
+  end
+  d.version = v
 end
 
 ---------------------------------------------------------------------------
@@ -242,6 +267,7 @@ Core:SetScript("OnEvent", function(self, event, arg1, ...)
     applyDefaults(db)
     if not db.created then db.created = time() end
     db.sessions = db.sessions + 1
+    ns.migrate(db)
     ns.db = db
     if JumpOrAscendStart then hooksecurefunc("JumpOrAscendStart", onJump) end
     if C_ChatInfo and C_ChatInfo.PerformEmote then hooksecurefunc(C_ChatInfo, "PerformEmote", onEmote) end
