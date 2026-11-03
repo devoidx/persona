@@ -1,5 +1,8 @@
 # Persona
 
+## v0.5.2
+- Movable panel
+
 ## v0.5.1
 - Fixed: opening the world map or a mailbox was counted as a /read emote.
   Existing /read counts are cleared.
