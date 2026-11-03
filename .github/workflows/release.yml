@@ -34,7 +34,6 @@ jobs:
           python -I tests/smoke_veteran.py Traits.lua
           python -I tests/smoke_core.py Core.lua
           python -I tests/smoke_ui.py Traits.lua UI.lua
-          python -I tests/smoke_ui.py Traits.lua UI.lua
 
       - uses: BigWigsMods/packager@v2
         with:
