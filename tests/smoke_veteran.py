@@ -13,7 +13,7 @@ local stats = { {1,"Total deaths","2,899"}, {2,"Deaths from falling","68"}, {3,"
   {7,"Total waves","57"}, {8,"Total facepalms","2"}, {9,"Total times LOL'd","0"} }
 function GetStatisticsCategoryList() return {100} end
 function GetCategoryNumAchievements() return #stats end
-function GetAchievementInfo(cat, i) return stats[i][1], stats[i][2] end
+function GetAchievementInfo(cat, i) if i == nil then return nil end return stats[i][1], stats[i][2] end
 function GetStatistic(id) for _, s in ipairs(stats) do if s[1]==id then return s[3] end end end
 function BreakUpLargeNumbers(n) return tostring(n) end
 ''')

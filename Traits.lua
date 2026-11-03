@@ -89,39 +89,49 @@ end
 -- Lifetime statistics (predate the addon, so they work on day one).
 -- Looked up by title on an English client rather than by hardcoded IDs.
 ---------------------------------------------------------------------------
--- Statistic titles we read, keyed by the short name used in this file.
--- A title that isn't found (renamed, or a non-English client) is skipped.
+-- Statistics we read. IDs are the same in every client language (taken from
+-- /persona stats on a 12.1.5 client); the English title is only a fallback in
+-- case Blizzard ever renumbers one.
 T.STATS = {
-  deaths      = "Total deaths",
-  fallDeaths  = "Deaths from falling",
-  waves       = "Total waves",
-  cheers      = "Total cheers",
-  lols        = "Total times LOL'd",
-  facepalms   = "Total facepalms",
-  violins     = "Total times playing world's smallest violin",
-  hugs        = "Number of hugs",
-  critters    = "Critters killed",
-  abandoned   = "Quests abandoned",
-  completed   = "Quests completed",
+  deaths     = { id = 60,   title = "Total deaths" },
+  fallDeaths = { id = 114,  title = "Deaths from falling" },
+  waves      = { id = 1065, title = "Total waves" },
+  cheers     = { id = 1045, title = "Total cheers" },
+  lols       = { id = 1066, title = "Total times LOL'd" },
+  facepalms  = { id = 1047, title = "Total facepalms" },
+  violins    = { id = 1067, title = "Total times playing world's smallest violin" },
+  hugs       = { id = 1042, title = "Number of hugs" },
+  critters   = { id = 108,  title = "Critters killed" },
+  abandoned  = { id = 94,   title = "Quests abandoned" },
+  completed  = { id = 98,   title = "Quests completed" },
 }
 
 local statIDs
 
 local function resolveStats()
   statIDs = {}
-  local byTitle = {}
-  for key, title in pairs(T.STATS) do byTitle[title] = key end
   -- Guard: statistics may be missing or empty on some client flavours
-  if not (GetStatisticsCategoryList and GetStatistic and GetAchievementInfo) then return end
+  if not (GetStatistic and GetAchievementInfo) then return end
+
+  -- 1. By ID: works in any language
+  local missing = {}
+  for key, s in pairs(T.STATS) do
+    local id = GetAchievementInfo(s.id)
+    if id then statIDs[key] = s.id else missing[s.title] = key end
+  end
+  if not next(missing) or not GetStatisticsCategoryList then return end
+
+  -- 2. By English title, for any ID that didn't resolve
   for _, cat in ipairs(GetStatisticsCategoryList() or {}) do
     for i = 1, (GetCategoryNumAchievements(cat) or 0) do
       local id, name = GetAchievementInfo(cat, i)
-      if id and byTitle[name] then statIDs[byTitle[name]] = id end
+      if id and missing[name] then statIDs[missing[name]] = id end
     end
   end
 end
 
 -- Returns the lifetime value, 0 if never recorded, nil if the statistic wasn't found.
+-- Digits only, so "4,252" and "4.252" both read as 4252.
 function T.Stat(key)
   if not statIDs then resolveStats() end
   local id = statIDs[key]
@@ -135,12 +145,13 @@ function T.LifetimeDeaths()
   return T.Stat("deaths"), T.Stat("fallDeaths")
 end
 
--- Debug: which statistics resolved on this client
+-- Debug: which statistics resolved on this client, under the client's own names
 function T.DumpStats()
   if not statIDs then resolveStats() end
-  for key, title in pairs(T.STATS) do
+  for key, s in pairs(T.STATS) do
     local id = statIDs[key]
-    print(("  %s: %s"):format(title, id and (tostring(T.Stat(key)) .. " (id " .. id .. ")") or "|cffff6060not found|r"))
+    local name = id and select(2, GetAchievementInfo(id)) or s.title
+    print(("  %s: %s"):format(name, id and (tostring(T.Stat(key)) .. " (id " .. id .. ")") or "|cffff6060not found|r"))
   end
 end
 
