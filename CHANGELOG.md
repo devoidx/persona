@@ -1,5 +1,8 @@
 # Persona
 
+## v0.5.3
+- Lifetime traits now work on every client language, not just English
+
 ## v0.5.2
 - Movable panel
 
