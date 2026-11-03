@@ -1,5 +1,9 @@
 # Persona
 
+## v0.5.1
+- Fixed: opening the world map or a mailbox was counted as a /read emote.
+  Existing /read counts are cleared.
+
 ## v0.5.0
 - Persona now notices your emotes: Signature Move, Dancer, Polite, Rude and Dances Alone.
 - New trait: Stone-Faced, for long-played characters who have never used /lol.
