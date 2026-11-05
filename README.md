@@ -23,9 +23,19 @@ Everything is stored per character in `PersonaDB`. No combat data is read, so it
 - `/persona`: toggle the panel
 - `/persona stats`: list which lifetime statistics this client provides
 - `/persona dock`: put the panel back beside the character frame after moving it
+- `/persona minimap`: hide or show the minimap button (Persona is also in the minimap's addons button)
 
 Drag the panel to move it. Once moved it opens where you left it, and stays open when the character frame closes.
 - `/persona reset`: wipe this character's data
+
+## Bundled libraries
+
+`Libs/` holds LibStub, CallbackHandler-1.0 (from Ace3, BSD licence), LibDataBroker-1.1 and LibDBIcon-1.0, for the minimap button.
+LibDBIcon comes from WowAce. To update it:
+
+```
+svn export --force https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0 Libs/LibDBIcon-1.0
+```
 
 ## Releasing
 

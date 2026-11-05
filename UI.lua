@@ -209,13 +209,12 @@ refresher:SetScript("OnUpdate", function(_, e)
   if ticker >= 2 then ticker = 0; ns.Refresh() end
 end)
 
-ns.OnDBReady = function() build() end
 
 ---------------------------------------------------------------------------
 -- Minimap addons button (the addon compartment). The game calls these by the
 -- names given in Persona.toc: click(addonName, mouseButton), enter/leave(addonName, button).
 ---------------------------------------------------------------------------
-function Persona_OnCompartmentClick(_, mouseButton)
+local function onClick(mouseButton)
   if mouseButton == "RightButton" then
     if ns.db then ns.db.panelPos = nil end
     if panel and panel:IsShown() then anchor() end
@@ -224,18 +223,61 @@ function Persona_OnCompartmentClick(_, mouseButton)
   ns.SetPanel(not (panel and panel:IsShown()))
 end
 
+local function fillTooltip(tt)
+  tt:AddLine("Persona")
+  if ns.db then tt:AddLine(T.Headline(T.Build(ns.db)), 1, 1, 1) end
+  tt:AddLine("Click to open or close", 0.6, 0.6, 0.6)
+  tt:AddLine("Right-click to dock beside the character frame", 0.6, 0.6, 0.6)
+end
+
+function Persona_OnCompartmentClick(_, mouseButton) onClick(mouseButton) end
+
 function Persona_OnCompartmentEnter(_, button)
   if not GameTooltip then return end
   GameTooltip:SetOwner(button, "ANCHOR_LEFT")
-  GameTooltip:AddLine("Persona")
-  if ns.db then GameTooltip:AddLine(T.Headline(T.Build(ns.db)), 1, 1, 1) end
-  GameTooltip:AddLine("Click to open or close", 0.6, 0.6, 0.6)
-  GameTooltip:AddLine("Right-click to dock beside the character frame", 0.6, 0.6, 0.6)
+  fillTooltip(GameTooltip)
   GameTooltip:Show()
 end
 
 function Persona_OnCompartmentLeave()
   if GameTooltip then GameTooltip:Hide() end
+end
+
+---------------------------------------------------------------------------
+-- Classic minimap button (LibDBIcon), for minimap replacements and button
+-- collectors that don't show Blizzard's addons button. Bundled in Libs/.
+-- If the libraries are missing, there's simply no button.
+---------------------------------------------------------------------------
+local minimapIcon
+
+local function setupMinimapButton()
+  local LDB = LibStub and LibStub("LibDataBroker-1.1", true)
+  minimapIcon = LibStub and LibStub("LibDBIcon-1.0", true)
+  if not (LDB and minimapIcon and ns.db) then minimapIcon = nil; return end
+  local launcher = LDB:NewDataObject("Persona", {
+    type = "launcher",
+    text = "Persona",
+    icon = "Interface\\Icons\\INV_Misc_Book_09",
+    OnClick = function(_, mouseButton) onClick(mouseButton) end,
+    OnTooltipShow = fillTooltip,
+  })
+  ns.db.minimap = ns.db.minimap or {}   -- LibDBIcon keeps hide and minimapPos here
+  minimapIcon:Register("Persona", launcher, ns.db.minimap)
+end
+
+-- Assigned here, below both functions, so setupMinimapButton is in scope
+ns.OnDBReady = function() build(); setupMinimapButton() end
+
+function ns.ToggleMinimapButton()
+  if not minimapIcon then
+    print("|cff66ccffPersona|r: the minimap button isn't available (libraries missing).")
+    return
+  end
+  local cfg = ns.db.minimap
+  cfg.hide = not cfg.hide
+  if cfg.hide then minimapIcon:Hide("Persona") else minimapIcon:Show("Persona") end
+  print(("|cff66ccffPersona|r: minimap button %s. Type /persona minimap to %s it."):format(
+    cfg.hide and "hidden" or "shown", cfg.hide and "show" or "hide"))
 end
 
 SLASH_PERSONA1 = "/persona"
@@ -244,6 +286,8 @@ SlashCmdList.PERSONA = function(msg)
   if msg == "stats" then
     print("|cff66ccffPersona|r: lifetime statistics on this client:")
     T.DumpStats()
+  elseif msg == "minimap" then
+    ns.ToggleMinimapButton()
   elseif msg == "dock" then
     if ns.db then ns.db.panelPos = nil end
     print("|cff66ccffPersona|r: panel docked beside the character frame again.")
