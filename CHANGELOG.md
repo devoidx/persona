@@ -1,5 +1,9 @@
 # Persona
 
+## v0.5.4
+- Minimap button: click to open, right-click to dock. /persona minimap hides it.
+- Persona also appears in the minimap's addons button.
+
 ## v0.5.3
 - Lifetime traits now work on every client language, not just English
 
