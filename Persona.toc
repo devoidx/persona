@@ -6,6 +6,9 @@
 ## X-Curse-Project-ID: 1779851
 ## SavedVariablesPerCharacter: PersonaDB
 ## IconTexture: Interface\Icons\INV_Misc_Book_09
+## AddonCompartmentFunc: Persona_OnCompartmentClick
+## AddonCompartmentFuncOnEnter: Persona_OnCompartmentEnter
+## AddonCompartmentFuncOnLeave: Persona_OnCompartmentLeave
 
 Core.lua
 Traits.lua

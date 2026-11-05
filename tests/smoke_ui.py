@@ -94,3 +94,30 @@ p, rel, rp, x, y = point()
 assert rel.name == "CharacterFrame", "dock should re-anchor immediately"
 C.Hide(C); assert not P.IsShown(P), "docked panel should close with the character frame"
 print("ok: drag, reopen, dock and reset")
+
+# Minimap addons button: the TOC names must exist as globals, and behave
+import re
+toc = open("Persona.toc").read()
+names = dict(re.findall(r"^## (AddonCompartmentFunc\w*): *(\S+)", toc, re.M))
+assert set(names) == {"AddonCompartmentFunc", "AddonCompartmentFuncOnEnter", "AddonCompartmentFuncOnLeave"}, names
+g = lua.globals()
+for field, fn in names.items():
+    assert g[fn] is not None, f"{field} names {fn}, which UI.lua doesn't define"
+click, enter, leave = (g[names[k]] for k in ("AddonCompartmentFunc", "AddonCompartmentFuncOnEnter", "AddonCompartmentFuncOnLeave"))
+lua.execute('''
+TIP = { lines = {} }
+GameTooltip = setmetatable({}, { __index = function() return function() end end })
+function GameTooltip:AddLine(t) TIP.lines[#TIP.lines + 1] = t end
+function GameTooltip:Show() TIP.shown = true end
+function GameTooltip:Hide() TIP.shown = false end
+''')
+C.Hide(C); ns.SetPanel(False)
+click("Persona", "LeftButton"); assert P.IsShown(P), "left click opens"
+click("Persona", "LeftButton"); assert not P.IsShown(P), "left click closes"
+ns.db.panelPos = lua.eval('{ point = "CENTER", relPoint = "CENTER", x = 1, y = 2 }')
+click("Persona", "RightButton"); assert ns.db.panelPos is None, "right click docks"
+enter("Persona", lua.eval('{}'))
+tip = lua.globals().TIP
+assert tip.shown and tip.lines[1] == "Persona" and tip.lines[2] == "Thrall", list(tip.lines.values())
+leave("Persona", None); assert not tip.shown
+print("ok: minimap addons button")

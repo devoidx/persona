@@ -211,6 +211,33 @@ end)
 
 ns.OnDBReady = function() build() end
 
+---------------------------------------------------------------------------
+-- Minimap addons button (the addon compartment). The game calls these by the
+-- names given in Persona.toc: click(addonName, mouseButton), enter/leave(addonName, button).
+---------------------------------------------------------------------------
+function Persona_OnCompartmentClick(_, mouseButton)
+  if mouseButton == "RightButton" then
+    if ns.db then ns.db.panelPos = nil end
+    if panel and panel:IsShown() then anchor() end
+    return
+  end
+  ns.SetPanel(not (panel and panel:IsShown()))
+end
+
+function Persona_OnCompartmentEnter(_, button)
+  if not GameTooltip then return end
+  GameTooltip:SetOwner(button, "ANCHOR_LEFT")
+  GameTooltip:AddLine("Persona")
+  if ns.db then GameTooltip:AddLine(T.Headline(T.Build(ns.db)), 1, 1, 1) end
+  GameTooltip:AddLine("Click to open or close", 0.6, 0.6, 0.6)
+  GameTooltip:AddLine("Right-click to dock beside the character frame", 0.6, 0.6, 0.6)
+  GameTooltip:Show()
+end
+
+function Persona_OnCompartmentLeave()
+  if GameTooltip then GameTooltip:Hide() end
+end
+
 SLASH_PERSONA1 = "/persona"
 SlashCmdList.PERSONA = function(msg)
   msg = strtrim(msg or ""):lower()
