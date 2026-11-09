@@ -1,5 +1,9 @@
 # Persona
 
+## v0.5.5
+- The panel now has tabs: Profile, Habits, Emotes, Lifetime and Places.
+- Traits that contradict each other no longer appear together.
+
 ## v0.5.4
 - Minimap button: click to open, right-click to dock. /persona minimap hides it.
 - Persona also appears in the minimap's addons button.
