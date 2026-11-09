@@ -1,5 +1,10 @@
 # Persona
 
+## v0.6.0
+- New Roster tab: every character on your account, who's the most restless,
+  the clumsiest and so on, plus account traits like Altoholic and One True Main.
+- /persona forget Name removes a character from the roster.
+
 ## v0.5.5
 - The panel now has tabs: Profile, Habits, Emotes, Lifetime and Places.
 - Traits that contradict each other no longer appear together.
