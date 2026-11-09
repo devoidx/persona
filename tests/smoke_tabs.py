@@ -119,8 +119,10 @@ check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.
       "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
       "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos")
 check("Emotes", "10 emotes, 3 different", "/dance - 6 (60%)", "Danced alone: 2 times")
+ns.db.soloDances = 1
+check("Emotes", "Danced alone: 1 time", absent=("1 times",))
 check("Lifetime", "Deaths: 2901 (69 from falling)", "Abandoned: 4252 (20%)", "LOLs: 0", "World's smallest violin: 0")
-check("Places", "3 places visited", "Bastion - Temple of Devotion - 2h 0m (33%)", "Where you stand around")
+check("Places", "3 places visited", "33%  Bastion - Temple of Devotion", "Where you stand around")
 ns.SetPanel(False); ns.SetPanel(True)
 assert ns.db.panelTab == "Places", "last tab remembered"
 ns.SetTab("Bogus"); assert ns.db.panelTab == "Places", "unknown tab ignored"

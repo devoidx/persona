@@ -200,7 +200,7 @@ function Tab.Emotes(db, add)
     end
     if (db.soloDances or 0) > 0 then
       add(" ")
-      add(("Danced alone: %s times"):format(num(db.soloDances)))
+      add(("Danced alone: %s %s"):format(num(db.soloDances), db.soloDances == 1 and "time" or "times"))
     end
   end
   add(" ")
@@ -247,10 +247,11 @@ function Tab.Places(db, add)
   end
   add(("%d places visited"):format(#places))
   add(" ")
-  add(gold .. "Most time spent|r")
+  add(gold .. "Share of your time|r")
+  -- Share first, so a long place name can wrap without splitting the number
   for i = 1, math.min(10, #places) do
     local z = places[i]
-    add(("%s - %s (%d%%)"):format(z.k, T.FmtTime(z.v), pctOf(z.v, db.tracked)))
+    add(("%d%%  %s"):format(pctOf(z.v, db.tracked), z.k))
   end
   local towns = T.TopN(db.idleZones, 3)
   if #towns > 0 then
