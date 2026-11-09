@@ -200,7 +200,8 @@ function Tab.Emotes(db, add)
     end
     if (db.soloDances or 0) > 0 then
       add(" ")
-      add(("Danced alone: %s %s"):format(num(db.soloDances), db.soloDances == 1 and "time" or "times"))
+      local n = db.soloDances
+      add("Danced alone: " .. (n == 1 and "once" or n == 2 and "twice" or (num(n) .. " times")))
     end
   end
   add(" ")
