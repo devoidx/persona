@@ -8,7 +8,9 @@ local _, ns = ...
 local T = ns.traits
 
 local WIDTH, PAD = 300, 14
-local panel, body, toggle, title, subtitle
+local panel, body, toggle, title, subtitle, tabBar
+local TABS = { "Profile", "Habits", "Emotes", "Lifetime", "Places" }
+local tabButtons = {}
 local playedRequested = false
 
 local function build()
@@ -57,8 +59,31 @@ local function build()
   close:SetPoint("TOPRIGHT", -2, -2)
   close:SetScript("OnClick", function() ns.SetPanel(false) end)
 
+  -- Tabs: plain buttons rather than Blizzard's tab templates, whose names have
+  -- changed between expansions and may differ on Forever.
+  tabBar = CreateFrame("Frame", nil, panel)
+  tabBar:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
+  tabBar:SetSize(WIDTH - PAD * 2, 20)
+  local line = tabBar:CreateTexture(nil, "ARTWORK")
+  line:SetColorTexture(0.6, 0.6, 0.6, 0.4)
+  line:SetPoint("BOTTOMLEFT"); line:SetPoint("BOTTOMRIGHT"); line:SetHeight(1)
+  local tabWidth = (WIDTH - PAD * 2) / #TABS
+  for i, name in ipairs(TABS) do
+    local b = CreateFrame("Button", nil, tabBar)
+    b:SetSize(tabWidth, 20)
+    b:SetPoint("BOTTOMLEFT", (i - 1) * tabWidth, 0)
+    b.label = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    b.label:SetPoint("CENTER", 0, 1)
+    b.label:SetText(name)
+    b.underline = b:CreateTexture(nil, "OVERLAY")
+    b.underline:SetColorTexture(1, 0.82, 0, 1)
+    b.underline:SetPoint("BOTTOMLEFT", 4, 0); b.underline:SetPoint("BOTTOMRIGHT", -4, 0); b.underline:SetHeight(2)
+    b:SetScript("OnClick", function() ns.SetTab(name) end)
+    tabButtons[name] = b
+  end
+
   body = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-  body:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -10)
+  body:SetPoint("TOPLEFT", tabBar, "BOTTOMLEFT", 0, -10)
   body:SetWidth(WIDTH - PAD * 2)
   body:SetJustifyH("LEFT")
   body:SetSpacing(2)
@@ -92,13 +117,13 @@ local function anchor()
   end
 end
 
-function ns.Refresh()
-  if not panel or not panel:IsShown() or not ns.db then return end
-  local db = ns.db
-  local lines = {}
-  local function add(s) lines[#lines + 1] = s end
-  local gold, grey = "|cffffd100", "|cff9d9d9d"
+local gold, grey, blue = "|cffffd100", "|cff9d9d9d", "|cff66ccff"
+local function pctOf(part, whole) return whole > 0 and math.floor(part / whole * 100 + 0.5) or 0 end
+local function num(n) return BreakUpLargeNumbers(math.floor(n or 0)) end
 
+local Tab = {}
+
+function Tab.Profile(db, add)
   -- Coverage: be upfront that this only knows what it has seen.
   if db.played then
     local share = db.played > 0 and math.min(1, db.tracked / db.played) or 0
@@ -109,79 +134,158 @@ function ns.Refresh()
     add(("%sObserved %s since install|r"):format(grey, T.FmtTime(db.tracked)))
   end
   add(" ")
-
   local traits = T.Build(db)
-  title:SetText(T.Headline(traits))
+  for _, t in ipairs(traits) do
+    add(("%s%s.|r %s"):format(blue, t.label, t.text))
+    add(" ")
+  end
+  if #traits == 0 or db.tracked < T.MIN_TRACKED then add(T.EmptyText(db)) end
+end
+
+function Tab.Habits(db, add)
+  add(gold .. "On the move|r")
+  local travelMin = db.travel / 60
+  add(("Jumps: %s total, %s while travelling%s"):format(num(db.totalJumps), num(db.travelJumps),
+    travelMin >= 1 and (" (%.1f/min)"):format(db.travelJumps / travelMin) or ""))
+  add(("Ground travel: %s (%s on foot)"):format(T.FmtTime(db.travel), T.FmtTime(db.onFoot)))
+  add(("Falls: %d, ~%s yd est., longest %.1fs"):format(db.falls, num(db.fallYards), db.longestFall))
+  local town = T.TopN(db.idleZones, 1)[1]
+  add(("Idle in towns: %s%s"):format(T.FmtTime(db.idleResting), town and (", mostly " .. town.k) or ""))
+
+  add(" ")
+  add(gold .. "When you play|r")
+  local function hours(from, to)
+    local t = 0
+    for h = from, to do t = t + (db.hours[h] or 0) end
+    return t
+  end
+  if db.tracked > 0 then
+    add(("Night (00-05): %d%%   Morning (05-12): %d%%"):format(pctOf(hours(0, 4), db.tracked), pctOf(hours(5, 11), db.tracked)))
+    add(("Afternoon (12-17): %d%%   Evening (17-24): %d%%"):format(pctOf(hours(12, 16), db.tracked), pctOf(hours(17, 23), db.tracked)))
+    add(("Weekends: %d%%"):format(pctOf((db.days[0] or 0) + (db.days[6] or 0), db.tracked)))
+    local peak = T.TopN(db.hours, 1)[1]
+    if peak then add(("Most active: %s"):format(T.HourRange(peak.k))) end
+  else
+    add(grey .. "Nothing recorded yet.|r")
+  end
+
+  add(" ")
+  add(gold .. "Favourite mounts|r")
+  local mounts = T.TopN(db.mounts, 5)
+  if #mounts == 0 then
+    add(grey .. "No riding recorded yet.|r")
+  else
+    for _, m in ipairs(mounts) do
+      add(("%s - %s (%d%%)"):format(T.MountName(m.k), T.FmtTime(m.v), pctOf(m.v, db.mounted)))
+    end
+  end
+end
+
+function Tab.Emotes(db, add)
+  local total = db.emoteTotal or 0
+  if total == 0 then
+    add("No emotes yet.")
+    add(" ")
+    add(grey .. "Persona counts every emote you use from now on: /dance, /wave, /bow and the rest.|r")
+  else
+    add(("%s emotes, %s different"):format(num(total), num(#T.TopN(db.emotes, 1000))))
+    add(" ")
+    for _, e in ipairs(T.TopN(db.emotes, 10)) do
+      add(("/%s - %s (%d%%)"):format(e.k:lower(), num(e.v), pctOf(e.v, total)))
+    end
+    if (db.soloDances or 0) > 0 then
+      add(" ")
+      add(("Danced alone: %s times"):format(num(db.soloDances)))
+    end
+  end
+  add(" ")
+  add(grey .. "Counted since install. Lifetime waves, cheers, hugs and more are on the Lifetime tab.|r")
+end
+
+function Tab.Lifetime(_, add)
+  local deaths = T.Stat("deaths")
+  if deaths == nil and T.Stat("completed") == nil then
+    add("This client has no Statistics panel to read.")
+    return
+  end
+  add(grey .. "From your Statistics panel: this character's whole life, not just since install.|r")
+  add(" ")
+  -- Zeros are shown on purpose: never having laughed is a fact too.
+  local function stat(label, key, extra)
+    local v = T.Stat(key)
+    if v then add(("%s: %s%s"):format(label, num(v), extra or "")) end
+  end
+  add(gold .. "Survival|r")
+  local falls = T.Stat("fallDeaths")
+  stat("Deaths", "deaths", (deaths and falls and deaths > 0) and (" (%s from falling)"):format(num(falls)) or "")
+  stat("Critters killed", "critters")
+  add(" ")
+  add(gold .. "Questing|r")
+  local done, quit = T.Stat("completed"), T.Stat("abandoned")
+  stat("Completed", "completed")
+  stat("Abandoned", "abandoned", (done and quit and done + quit > 0) and (" (%d%%)"):format(pctOf(quit, done + quit)) or "")
+  add(" ")
+  add(gold .. "Social|r")
+  stat("Waves", "waves")
+  stat("Cheers", "cheers")
+  stat("Hugs", "hugs")
+  stat("LOLs", "lols")
+  stat("Facepalms", "facepalms")
+  stat("World's smallest violin", "violins")
+end
+
+function Tab.Places(db, add)
+  local places = T.TopN(db.zones, 1000)
+  if #places == 0 then
+    add(grey .. "Nowhere recorded yet.|r")
+    return
+  end
+  add(("%d places visited"):format(#places))
+  add(" ")
+  add(gold .. "Most time spent|r")
+  for i = 1, math.min(10, #places) do
+    local z = places[i]
+    add(("%s - %s (%d%%)"):format(z.k, T.FmtTime(z.v), pctOf(z.v, db.tracked)))
+  end
+  local towns = T.TopN(db.idleZones, 3)
+  if #towns > 0 then
+    add(" ")
+    add(gold .. "Where you stand around|r")
+    for _, z in ipairs(towns) do add(("%s - %s"):format(z.k, T.FmtTime(z.v))) end
+  end
+end
+
+local function currentTab()
+  local t = ns.db and ns.db.panelTab
+  return (t and Tab[t]) and t or "Profile"
+end
+
+function ns.Refresh()
+  if not panel or not panel:IsShown() or not ns.db then return end
+  local db = ns.db
+
+  title:SetText(T.Headline(T.Build(db)))
   local level, race, class = UnitLevel("player"), UnitRace("player"), UnitClass("player")
   subtitle:SetText(("Level %d %s %s, as seen through %s habits"):format(level or 0, race or "", class or "",
     (UnitSex("player") == 2 and "his") or (UnitSex("player") == 3 and "her") or "their"))
 
-  add(gold .. "Who they are|r")
-  local MAX_SHOWN = 6
-  for i, t in ipairs(traits) do
-    if i > MAX_SHOWN then
-      add(("%s...and %d more quirks.|r"):format(grey, #traits - MAX_SHOWN))
-      add(" ")
-      break
-    end
-    add(("|cff66ccff%s.|r %s"):format(t.label, t.text))
-    add(" ")
-  end
-  if #traits == 0 or db.tracked < T.MIN_TRACKED then
-    add(T.EmptyText(db))
-    add(" ")
+  local selected = currentTab()
+  for name, b in pairs(tabButtons) do
+    local on = name == selected
+    b.label:SetTextColor(on and 1 or 0.6, on and 0.82 or 0.6, on and 0 or 0.6)
+    b.underline:SetShown(on)
   end
 
-  add(gold .. "The evidence|r")
-  local travelMin = db.travel / 60
-  add(("Jumps: %s total, %s while travelling%s"):format(BreakUpLargeNumbers(db.totalJumps),
-    BreakUpLargeNumbers(db.travelJumps),
-    travelMin >= 1 and (" (%.1f/min)"):format(db.travelJumps / travelMin) or ""))
-  if (db.emoteTotal or 0) > 0 then
-    local fav = T.TopN(db.emotes, 1)[1]
-    add(("Emotes: %s (favourite: /%s, %s times)"):format(BreakUpLargeNumbers(db.emoteTotal),
-      fav.k:lower(), BreakUpLargeNumbers(fav.v)))
-  end
-  add(("Ground travel: %s (%s on foot)"):format(T.FmtTime(db.travel), T.FmtTime(db.onFoot)))
-  add(("Idle in towns: %s"):format(T.FmtTime(db.idleResting)))
-  add(("Falls: %d, ~%s yd est., longest %.1fs"):format(db.falls,
-    BreakUpLargeNumbers(math.floor(db.fallYards)), db.longestFall))
-  local peak = T.TopN(db.hours, 1)[1]
-  if peak then add(("Most active: %s"):format(T.HourRange(peak.k))) end
-
-  add(" ")
-  add(gold .. "Lifetime record|r")
-  local deaths, fallDeaths = T.LifetimeDeaths()
-  if deaths and fallDeaths then
-    add(("Deaths: %s (%s from falling)"):format(BreakUpLargeNumbers(deaths), BreakUpLargeNumbers(fallDeaths)))
-  end
-  local function stat(label, key)
-    local v = T.Stat(key)
-    if v and v > 0 then add(("%s: %s"):format(label, BreakUpLargeNumbers(v))) end
-  end
-  stat("Quests abandoned", "abandoned")
-  stat("Critters killed", "critters")
-  stat("Hugs", "hugs")
-  stat("Waves", "waves")
-  stat("LOLs", "lols")
-  stat("Facepalms", "facepalms")
-
-  local mounts = T.TopN(db.mounts, 3)
-  if #mounts > 0 then
-    add(" ")
-    add(gold .. "Favourite mounts|r")
-    for _, m in ipairs(mounts) do add(("%s - %s"):format(T.MountName(m.k), T.FmtTime(m.v))) end
-  end
-
-  local zones = T.TopN(db.zones, 5)
-  if #zones > 0 then
-    add(" ")
-    add(gold .. "Most visited|r")
-    for _, z in ipairs(zones) do add(("%s - %s"):format(z.k, T.FmtTime(z.v))) end
-  end
-
+  local lines = {}
+  Tab[selected](db, function(s) lines[#lines + 1] = s end)
   body:SetText(table.concat(lines, "\n"))
-  panel:SetHeight(title:GetStringHeight() + subtitle:GetStringHeight() + body:GetStringHeight() + 50)
+  panel:SetHeight(title:GetStringHeight() + subtitle:GetStringHeight() + 20 + body:GetStringHeight() + 60)
+end
+
+function ns.SetTab(name)
+  if not Tab[name] or not ns.db then return end
+  ns.db.panelTab = name
+  ns.Refresh()
 end
 
 function ns.SetPanel(show, fromCharFrame)

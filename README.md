@@ -4,6 +4,8 @@ A World of Warcraft addon that watches how your character behaves and writes a p
 
 Open it with `/persona` or the **Persona** button under the character frame.
 
+The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emotes**, **Lifetime** (from the Statistics panel) and **Places**. It remembers the last tab you used.
+
 ## What it tracks
 
 | Habit | How |

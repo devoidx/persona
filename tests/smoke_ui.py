@@ -38,6 +38,10 @@ function Frame:GetPoint(i) local q = self.points[i or 1]; if q then return q[1],
 function Frame:SetScript(k, f) self.scripts[k] = f end
 function Frame:HookScript(k, f) self.hooks[k] = f end
 function Frame:CreateFontString() return Frame.new() end
+function Frame:CreateTexture() return Frame.new() end
+function Frame:SetText(t) self.text = t end
+function Frame:GetText() return self.text end
+function Frame:SetShown(v) self.shown = v and true or false end
 function Frame:GetStringHeight() return 10 end
 function Frame:StartMoving() self.moving = true end
 function Frame:StopMovingOrSizing() self.moving = false end
