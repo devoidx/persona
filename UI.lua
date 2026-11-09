@@ -145,12 +145,15 @@ end
 function Tab.Habits(db, add)
   add(gold .. "On the move|r")
   local travelMin = db.travel / 60
-  add(("Jumps: %s total, %s while travelling%s"):format(num(db.totalJumps), num(db.travelJumps),
-    travelMin >= 1 and (" (%.1f/min)"):format(db.travelJumps / travelMin) or ""))
+  -- One value per line: the panel fits about 38 characters before wrapping.
+  add(("Jumps: %s (%s while travelling)"):format(num(db.totalJumps), num(db.travelJumps)))
+  if travelMin >= 1 then add(("Jump rate on the move: %.1f a minute"):format(db.travelJumps / travelMin)) end
   add(("Ground travel: %s (%s on foot)"):format(T.FmtTime(db.travel), T.FmtTime(db.onFoot)))
-  add(("Falls: %d, ~%s yd est., longest %.1fs"):format(db.falls, num(db.fallYards), db.longestFall))
+  add(("Falls: %d, longest %.1fs"):format(db.falls, db.longestFall))
+  if db.fallYards >= 1 then add(("Distance fallen: about %s yd"):format(num(db.fallYards))) end
   local town = T.TopN(db.idleZones, 1)[1]
-  add(("Idle in towns: %s%s"):format(T.FmtTime(db.idleResting), town and (", mostly " .. town.k) or ""))
+  add(("Idle in towns: %s"):format(T.FmtTime(db.idleResting)))
+  if town then add(("Mostly in %s"):format(town.k)) end
 
   add(" ")
   add(gold .. "When you play|r")
@@ -160,8 +163,10 @@ function Tab.Habits(db, add)
     return t
   end
   if db.tracked > 0 then
-    add(("Night (00-05): %d%%   Morning (05-12): %d%%"):format(pctOf(hours(0, 4), db.tracked), pctOf(hours(5, 11), db.tracked)))
-    add(("Afternoon (12-17): %d%%   Evening (17-24): %d%%"):format(pctOf(hours(12, 16), db.tracked), pctOf(hours(17, 23), db.tracked)))
+    add(("Night (00-05): %d%%"):format(pctOf(hours(0, 4), db.tracked)))
+    add(("Morning (05-12): %d%%"):format(pctOf(hours(5, 11), db.tracked)))
+    add(("Afternoon (12-17): %d%%"):format(pctOf(hours(12, 16), db.tracked)))
+    add(("Evening (17-24): %d%%"):format(pctOf(hours(17, 23), db.tracked)))
     add(("Weekends: %d%%"):format(pctOf((db.days[0] or 0) + (db.days[6] or 0), db.tracked)))
     local peak = T.TopN(db.hours, 1)[1]
     if peak then add(("Most active: %s"):format(T.HourRange(peak.k))) end

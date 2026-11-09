@@ -106,13 +106,18 @@ def start(db, extra=""):
         for w in absent:
             assert w not in text, f"{tab}: should not contain {w!r}\n{text}"
         assert "{" not in text and "nil" not in text, f"{tab}: bad formatting\n{text}"
+        if tab == "Habits":
+            import re
+            for line in re.sub(r"\|c\w{8}|\|r", "", text).split("\n"):
+                assert len(line) <= 38, f"Habits line too long to fit: {line!r}"
     return ns, check
 
 # 1. Veteran character
 ns, check = start(VETERAN, VETERAN_STATS)
 check("Profile", "Observed 6h 0m since install", "Menace to Wildlife", absent=("and more quirks",))
-check("Habits", "Jumps: 900 total", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
-      "Wolf - 50m (83%)", "Idle in towns: 30m, mostly Oribos")
+check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.0 a minute",
+      "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
+      "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos")
 check("Emotes", "10 emotes, 3 different", "/dance - 6 (60%)", "Danced alone: 2 times")
 check("Lifetime", "Deaths: 2901 (69 from falling)", "Abandoned: 4252 (20%)", "LOLs: 0", "World's smallest violin: 0")
 check("Places", "3 places visited", "Bastion - Temple of Devotion - 2h 0m (33%)", "Where you stand around")
