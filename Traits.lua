@@ -566,8 +566,23 @@ function T.Build(db)
     end
   end
 
-  table.sort(out, function(a, b) return a.score > b.score end)
-  return out
+  -- Traits that contradict each other as personality, even when the data
+  -- supports both: keep only the stronger of each pair.
+  local OPPOSITES = { { "homebody", "wanderer" }, { "nightowl", "earlybird" } }
+  local byId = {}
+  for i, t in ipairs(out) do byId[t.id] = i end
+  local drop = {}
+  for _, pair in ipairs(OPPOSITES) do
+    local a, b = byId[pair[1]], byId[pair[2]]
+    if a and b then drop[out[a].score >= out[b].score and b or a] = true end
+  end
+  local kept = {}
+  for i, t in ipairs(out) do
+    if not drop[i] then kept[#kept + 1] = t end
+  end
+
+  table.sort(kept, function(x, y) return x.score > y.score end)
+  return kept
 end
 
 ---------------------------------------------------------------------------

@@ -47,3 +47,15 @@ for day in range(1, 22):
         assert len(re.findall(r"minute", text)) <= 1, f"unit repeated: {text}"
         assert "Consent" not in text
 print(f"ok: {len(seen)} phrasings rendered cleanly")
+
+# Opposites never appear together: Zugzwang's real case (127 places, 25% in one)
+lua.execute('''date = os.date''')
+zones = "{" + ", ".join(f'["Place {i}"] = 60' for i in range(126)) + ', ["The Bazaar"] = 15 * 3600 }'
+both = lua.eval(f"""{{ tracked = 60 * 3600, travel = 0, onFoot = 0, travelJumps = 0, totalJumps = 0, mounted = 0,
+  mounts = {{}}, zones = {zones}, idleResting = 0, idleZones = {{}}, falls = 0, fallYards = 0, longestFall = 0,
+  hours = {{ [2] = 20 * 3600, [6] = 20 * 3600 }}, days = {{}}, emotes = {{}}, emoteTotal = 0, soloDances = 0 }}""")
+got = [t.id for t in ns.traits.Build(both).values()]
+assert not ("homebody" in got and "wanderer" in got), got
+assert not ("nightowl" in got and "earlybird" in got), got
+assert ("homebody" in got) != ("wanderer" in got), f"exactly one of the pair should remain: {got}"
+print("ok: contradictory traits never shown together")
