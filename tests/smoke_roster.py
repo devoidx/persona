@@ -162,3 +162,35 @@ cmd("forget thrall"); assert chars["Player-1-THRALL"] is not None, "can't forget
 cmd("forget zugzwang-argentdawn"); assert chars["Player-1-ZUGZWANG"] is None, "Name-Realm form"
 cmd("forget nobody")   # no error
 print("ok: forget by name and Name-Realm; live character protected")
+
+# 6. Forever: same first name, different surnames, same ruleset "realm".
+#    UnitName's second value is the surname there; Persona must not treat it as a realm.
+forever = """
+  function UnitGUID() return "Player-6949-JEEMHUNT" end
+  function UnitName() return "Jeem", "Hunt" end
+  function GetUnitName() return "Jeem Hunt" end
+  function GetRealmName() return "Classic Beta PvE" end
+"""
+lua = LuaRuntime()
+lua.execute(STUBS); lua.execute(RECORD_FONTSTRINGS); lua.execute(CLIENT); lua.execute(forever)
+lua.execute("""PersonaAccountDB = { characters = {
+  ["Player-6949-JEEMSTONE"] = { name = "Jeem", fullName = "Jeem Stone", realm = "Classic Beta PvE", class = "MAGE",
+    level = 30, title = "Jeem", traits = {}, scores = {}, tracked = 3600, lastSeen = NOW - 86400 },
+  ["Player-6949-OTHER"] = { name = "Ada", fullName = "Ada Lake", realm = "Classic Beta PvE", class = "MAGE",
+    level = 30, title = "Ada", traits = {}, scores = {}, tracked = 3600, lastSeen = NOW - 86400 } } }""")
+ns = lua.table()
+load = lua.eval('function(src, name, ns) return load(src, name)("Persona", ns) end')
+for f in ("Traits.lua", "Roster.lua", "UI.lua"):
+    load(open(f).read(), f, ns)
+ns.db = lua.eval(THRALL)
+ns.OnDBReady(ns.db)
+ns.roster.Save()
+chars = lua.globals().PersonaAccountDB.characters
+me = chars["Player-6949-JEEMHUNT"]
+assert me.name == "Jeem" and me.fullName == "Jeem Hunt" and me.realm == "Classic Beta PvE", (me.name, me.fullName, me.realm)
+F = ns.roster.Forget
+assert "More than one" in F("jeem"), "two Jeems: ambiguous"
+assert "can't forget" in F("Jeem Hunt"), "full name finds the live character"
+assert F("jeem stone") == "Forgot Jeem Stone." and chars["Player-6949-JEEMSTONE"] is None
+assert F("ada-lake") == "Forgot Ada Lake.", "First-Surname form works too"
+print("ok: Forever surnames stored as full name, never as realm; forget by full name")

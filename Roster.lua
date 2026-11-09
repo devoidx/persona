@@ -52,6 +52,10 @@ local function summarise(db)
   local _, classFile = UnitClass("player")
   return {
     name = UnitName("player"),
+    -- Forever adds a surname. GetUnitName returns "First Surname" there and
+    -- just the name on retail; UnitName's second value is a surname on Forever
+    -- and a realm on retail, so it's never used.
+    fullName = GetUnitName and GetUnitName("player", false) or UnitName("player"),
     realm = GetRealmName and GetRealmName() or nil,
     class = classFile,
     level = UnitLevel("player"),
@@ -174,22 +178,26 @@ function R.Ordered(list)
   return active, w
 end
 
--- /persona forget Name (or Name-Realm). Returns a message for the chat frame.
+-- /persona forget Name, Name-Realm, or First Surname on Forever.
+-- Returns a message for the chat frame.
 function R.Forget(arg)
   arg = ((arg or ""):lower():gsub("%s", ""))
-  if arg == "" then return "Usage: /persona forget Name (or Name-Realm)." end
+  if arg == "" then return "Usage: /persona forget Name (or Name-Realm, or First Surname)." end
   local hits = {}
   for key, c in pairs(account().characters) do
     local name = (c.name or ""):lower()
-    local full = name .. "-" .. ((c.realm or ""):lower():gsub("%s", ""))
-    if arg == name or arg == full then hits[#hits + 1] = key end
+    local withRealm = name .. "-" .. ((c.realm or ""):lower():gsub("%s", ""))
+    local fullName = ((c.fullName or ""):lower():gsub("[%s%-]", ""))
+    -- An exact full name wins outright, so "Jeem Hunt" isn't ambiguous with "Jeem Stone"
+    if fullName ~= "" and fullName ~= name and (arg:gsub("%-", "")) == fullName then hits = { key }; break end
+    if arg == name or arg == withRealm then hits[#hits + 1] = key end
   end
   if #hits == 0 then return ("No character called %s in the roster."):format(arg) end
-  if #hits > 1 then return ("More than one %s: use Name-Realm."):format(arg) end
+  if #hits > 1 then return ("More than one %s: use their full name or Name-Realm."):format(arg) end
   if hits[1] == playerKey() then return "You can't forget the character you're playing." end
   local c = account().characters[hits[1]]
   account().characters[hits[1]] = nil
-  return ("Forgot %s."):format(c.name)
+  return ("Forgot %s."):format(c.fullName or c.name)
 end
 
 -- Keep the summary current: on entering the world and on logout
