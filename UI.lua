@@ -7,9 +7,9 @@
 local _, ns = ...
 local T = ns.traits
 
-local WIDTH, PAD = 300, 14
+local WIDTH, PAD = 320, 14
 local panel, body, toggle, title, subtitle, tabBar
-local TABS = { "Profile", "Habits", "Emotes", "Lifetime", "Places" }
+local TABS = { "Profile", "Habits", "Emotes", "Lifetime", "Places", "Roster" }
 local tabButtons = {}
 local playedRequested = false
 
@@ -262,6 +262,51 @@ function Tab.Places(db, add)
   end
 end
 
+function Tab.Roster(_, add)
+  local R = ns.roster
+  if not R then return end
+  local list = R.List()
+  if #list <= 1 then
+    add(("Only %s so far."):format(UnitName("player") or "you"))
+    add(" ")
+    add(grey .. "Log into your other characters with Persona installed and they'll appear here.|r")
+    return
+  end
+  local ordered, w = R.Ordered(list)
+  local total = 0
+  for _, c in ipairs(ordered) do total = total + (w[c.key] or 0) end
+
+  add(gold .. "Your characters|r")
+  for _, c in ipairs(ordered) do
+    if c.stale then
+      add(("%s%s|r"):format(grey, c.title or c.name))
+      add(("%sNot seen for %d days|r"):format(grey, math.floor((time() - (c.lastSeen or 0)) / 86400)))
+    else
+      local colour = RAID_CLASS_COLORS and c.class and RAID_CLASS_COLORS[c.class]
+      local hex = colour and colour.colorStr or "ffffffff"
+      add(("|c%s%s|r"):format(hex, c.title or c.name))
+      local share = total > 0 and math.floor((w[c.key] or 0) / total * 100 + 0.5) or 0
+      add(("%sLevel %d, %d%% of your time%s|r"):format(grey, c.level or 0, share, c.current and ", playing now" or ""))
+    end
+  end
+
+  local who = R.Comparisons(list)
+  if #who > 0 then
+    add(" ")
+    add(gold .. "Who's who|r")
+    for _, line in ipairs(who) do add(line) end
+  end
+
+  local traits = R.AccountTraits(list)
+  if #traits > 0 then
+    add(" ")
+    add(gold .. "Your account|r")
+    for _, t in ipairs(traits) do
+      add(("%s%s.|r %s"):format(blue, t.label, t.text))
+    end
+  end
+end
+
 local function currentTab()
   local t = ns.db and ns.db.panelTab
   return (t and Tab[t]) and t or "Profile"
@@ -399,6 +444,10 @@ SlashCmdList.PERSONA = function(msg)
     T.DumpStats()
   elseif msg == "minimap" then
     ns.ToggleMinimapButton()
+  elseif msg:match("^forget") then
+    local reply = ns.roster and ns.roster.Forget(msg:match("^forget%s*(.*)$")) or "Roster unavailable."
+    print("|cff66ccffPersona|r: " .. reply)
+    ns.Refresh()
   elseif msg == "dock" then
     if ns.db then ns.db.panelPos = nil end
     print("|cff66ccffPersona|r: panel docked beside the character frame again.")

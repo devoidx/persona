@@ -4,7 +4,7 @@ A World of Warcraft addon that watches how your character behaves and writes a p
 
 Open it with `/persona` or the **Persona** button under the character frame.
 
-The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emotes**, **Lifetime** (from the Statistics panel) and **Places**. It remembers the last tab you used.
+The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emotes**, **Lifetime** (from the Statistics panel), **Places** and **Roster** (every character on your account). It remembers the last tab you used.
 
 ## What it tracks
 
@@ -26,6 +26,7 @@ Everything is stored per character in `PersonaDB`. No combat data is read, so it
 - `/persona stats`: list which lifetime statistics this client provides
 - `/persona dock`: put the panel back beside the character frame after moving it
 - `/persona minimap`: hide or show the minimap button (Persona is also in the minimap's addons button)
+- `/persona forget Name`: remove a character from the roster (use `Name-Realm` if two share a name)
 
 Drag the panel to move it. Once moved it opens where you left it, and stays open when the character frame closes.
 - `/persona reset`: wipe this character's data

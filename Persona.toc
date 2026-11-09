@@ -5,6 +5,7 @@
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1779851
 ## SavedVariablesPerCharacter: PersonaDB
+## SavedVariables: PersonaAccountDB
 ## IconTexture: Interface\Icons\INV_Misc_Book_09
 ## AddonCompartmentFunc: Persona_OnCompartmentClick
 ## AddonCompartmentFuncOnEnter: Persona_OnCompartmentEnter
@@ -16,4 +17,5 @@ Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 Core.lua
 Traits.lua
+Roster.lua
 UI.lua
