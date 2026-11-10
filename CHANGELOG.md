@@ -1,5 +1,10 @@
 # Persona
 
+## v0.6.1
+- New traits: Hoarder, Travels Light, Nemesis (where you keep dying) and Easily Distracted.
+- Every trait now has five phrasings, so your profile reads differently from day to day.
+- Habits shows bag fullness and AFK time; Places shows where you die.
+
 ## v0.6.0
 - New Roster tab: every character on your account, who's the most restless,
   the clumsiest and so on, plus account traits like Altoholic and One True Main.
