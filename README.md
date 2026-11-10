@@ -29,6 +29,7 @@ Everything is stored per character in `PersonaDB`. No combat data is read, so it
 - `/persona`: toggle the panel
 - `/persona stats`: list which lifetime statistics this client provides
 - `/persona moves`: list the class and racial moves counted on this character
+- `/persona share` (or `/persona share chat`): open a copy box with your profile as text for Discord or in-game chat; also the **Share** button next to the panel title
 - `/persona dock`: put the panel back beside the character frame after moving it
 - `/persona minimap`: hide or show the minimap button (Persona is also in the minimap's addons button)
 - `/persona forget Name`: remove a character from the roster (use `Name-Realm` if two share a name)

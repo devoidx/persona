@@ -46,7 +46,7 @@ local function build()
 
   title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
   title:SetPoint("TOPLEFT", PAD, -PAD)
-  title:SetWidth(WIDTH - PAD * 2 - 24)
+  title:SetWidth(WIDTH - PAD * 2 - 24 - 60)   -- room for the Share button
   title:SetJustifyH("LEFT")
   title:SetText("Persona")
 
@@ -58,6 +58,12 @@ local function build()
   local close = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", -2, -2)
   close:SetScript("OnClick", function() ns.SetPanel(false) end)
+
+  local share = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+  share:SetSize(56, 20)
+  share:SetPoint("TOPRIGHT", -30, -7)
+  share:SetText("Share")
+  share:SetScript("OnClick", function() if ns.share then ns.share.Show() end end)
 
   -- Tabs: plain buttons rather than Blizzard's tab templates, whose names have
   -- changed between expansions and may differ on Forever.
@@ -469,7 +475,9 @@ end
 SLASH_PERSONA1 = "/persona"
 SlashCmdList.PERSONA = function(msg)
   msg = strtrim(msg or ""):lower()
-  if msg == "moves" then
+  if msg == "share" or msg == "share chat" then
+    if ns.share then ns.share.Show(msg == "share chat" and "chat" or "discord") end
+  elseif msg == "moves" then
     print("|cff66ccffPersona|r: signature moves counted on this character:")
     for _, line in ipairs(ns.moves and ns.moves.Report() or {}) do print(line) end
   elseif msg == "stats" then

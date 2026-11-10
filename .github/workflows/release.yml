@@ -41,6 +41,7 @@ jobs:
           python -I tests/smoke_core_events.py Core.lua
           python -I tests/check_copy.py Traits.lua
           python -I tests/smoke_moves.py
+          python -I tests/smoke_share.py
 
       - uses: BigWigsMods/packager@v2
         with:

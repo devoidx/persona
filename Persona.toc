@@ -19,4 +19,5 @@ Core.lua
 Moves.lua
 Traits.lua
 Roster.lua
+Share.lua
 UI.lua
