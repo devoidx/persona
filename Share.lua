@@ -124,6 +124,11 @@ local function build()
 
   tinsert(UISpecialFrames, "PersonaShareBox")   -- Escape closes it like other windows
   box:Hide()
+
+  -- The parts a UI skin (Skin.lua) restyles
+  S.parts = { box = box, close = close, edit = edit, scroll = scroll, heading = heading, hint = hint,
+              buttons = { kindButtons.discord, kindButtons.chat } }
+  if ns.skin then ns.skin.ShareBox() end
 end
 
 function S.Show(kind)

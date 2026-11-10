@@ -24,6 +24,10 @@ The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emot
 
 Everything is stored per character in `PersonaDB`. No combat data is read, so it is unaffected by Midnight's secret-value restrictions.
 
+## Matching your UI
+
+With EllesmereUI installed, Persona's window, buttons and fonts take on EllesmereUI's look through its skinning API. Turn it off in EllesmereUI under Blizzard Skins+ > Window Skins > Third-Party Addons.
+
 ## Commands
 
 - `/persona`: toggle the panel

@@ -42,6 +42,7 @@ jobs:
           python -I tests/check_copy.py Traits.lua
           python -I tests/smoke_moves.py
           python -I tests/smoke_share.py
+          python -I tests/smoke_skin.py
 
       - uses: BigWigsMods/packager@v2
         with:

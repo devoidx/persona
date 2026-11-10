@@ -6,6 +6,7 @@
 ## X-Curse-Project-ID: 1779851
 ## SavedVariablesPerCharacter: PersonaDB
 ## SavedVariables: PersonaAccountDB
+## OptionalDeps: EllesmereUI
 ## IconTexture: Interface\Icons\INV_Misc_Book_09
 ## AddonCompartmentFunc: Persona_OnCompartmentClick
 ## AddonCompartmentFuncOnEnter: Persona_OnCompartmentEnter
@@ -21,3 +22,4 @@ Traits.lua
 Roster.lua
 Share.lua
 UI.lua
+Skin.lua

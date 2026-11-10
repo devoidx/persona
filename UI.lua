@@ -11,6 +11,8 @@ local WIDTH, PAD = 320, 14
 local panel, body, toggle, title, subtitle, tabBar
 local TABS = { "Profile", "Habits", "Emotes", "Lifetime", "Places", "Roster" }
 local tabButtons = {}
+-- Colour of the selected tab: Blizzard gold unless a UI skin supplies its accent (Skin.lua)
+ns.accent = { 1, 0.82, 0 }
 local playedRequested = false
 
 local function build()
@@ -109,6 +111,11 @@ local function build()
       if not (ns.db and ns.db.panelPos) then panel:Hide() end
     end)
   end
+
+  -- The parts a UI skin (Skin.lua) restyles
+  ns.ui = { panel = panel, close = close, share = share, toggle = toggle,
+            title = title, subtitle = subtitle, body = body, tabs = tabButtons }
+  if ns.skin then ns.skin.Panel() end
 end
 
 local function anchor()
@@ -360,7 +367,9 @@ function ns.Refresh()
   local selected = currentTab()
   for name, b in pairs(tabButtons) do
     local on = name == selected
-    b.label:SetTextColor(on and 1 or 0.6, on and 0.82 or 0.6, on and 0 or 0.6)
+    local a = ns.accent
+    if on then b.label:SetTextColor(a[1], a[2], a[3]) else b.label:SetTextColor(0.6, 0.6, 0.6) end
+    b.underline:SetColorTexture(a[1], a[2], a[3], 1)
     b.underline:SetShown(on)
   end
 
