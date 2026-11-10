@@ -130,7 +130,14 @@ local function anchor()
   end
 end
 
-local gold, grey, blue = "|cffffd100", "|cff9d9d9d", "|cff66ccff"
+local grey, blue = "|cff9d9d9d", "|cff66ccff"
+-- Section headings use the same accent as the selected tab: Blizzard gold by
+-- default, the theme's colour under EllesmereUI
+local function heading()
+  local a = ns.accent
+  local function h(x) return math.floor(math.max(0, math.min(1, x)) * 255 + 0.5) end
+  return ("|cff%02x%02x%02x"):format(h(a[1]), h(a[2]), h(a[3]))
+end
 local function pctOf(part, whole) return whole > 0 and math.floor(part / whole * 100 + 0.5) or 0 end
 local function num(n) return BreakUpLargeNumbers(math.floor(n or 0)) end
 
@@ -156,7 +163,7 @@ function Tab.Profile(db, add)
 end
 
 function Tab.Habits(db, add)
-  add(gold .. "On the move|r")
+  add(heading() .. "On the move|r")
   local travelMin = db.travel / 60
   -- One value per line: the panel fits about 38 characters before wrapping.
   add(("Jumps: %s (%s while travelling)"):format(num(db.totalJumps), num(db.travelJumps)))
@@ -185,14 +192,14 @@ function Tab.Habits(db, add)
   local formTravel, stealth = db.formTravel or 0, db.stealthTime or 0
   if #used > 0 or formTravel > 0 or stealth > 0 then
     add(" ")
-    add(gold .. "Signature moves|r")
+    add(heading() .. "Signature moves|r")
     for _, u in ipairs(used) do add(("%s: %s"):format(u.label, num(u.n))) end
     if formTravel > 0 then add(("In animal form: %s"):format(T.FmtTime(formTravel))) end
     if stealth > 0 then add(("Stealthed outside combat: %s"):format(T.FmtTime(stealth))) end
   end
 
   add(" ")
-  add(gold .. "When you play|r")
+  add(heading() .. "When you play|r")
   local function hours(from, to)
     local t = 0
     for h = from, to do t = t + (db.hours[h] or 0) end
@@ -211,7 +218,7 @@ function Tab.Habits(db, add)
   end
 
   add(" ")
-  add(gold .. "Favourite mounts|r")
+  add(heading() .. "Favourite mounts|r")
   local mounts = T.TopN(db.mounts, 5)
   if #mounts == 0 then
     add(grey .. "No riding recorded yet.|r")
@@ -257,17 +264,17 @@ function Tab.Lifetime(_, add)
     local v = T.Stat(key)
     if v then add(("%s: %s%s"):format(label, num(v), extra or "")) end
   end
-  add(gold .. "Survival|r")
+  add(heading() .. "Survival|r")
   local falls = T.Stat("fallDeaths")
   stat("Deaths", "deaths", (deaths and falls and deaths > 0) and (" (%s from falling)"):format(num(falls)) or "")
   stat("Critters killed", "critters")
   add(" ")
-  add(gold .. "Questing|r")
+  add(heading() .. "Questing|r")
   local done, quit = T.Stat("completed"), T.Stat("abandoned")
   stat("Completed", "completed")
   stat("Abandoned", "abandoned", (done and quit and done + quit > 0) and (" (%d%%)"):format(pctOf(quit, done + quit)) or "")
   add(" ")
-  add(gold .. "Social|r")
+  add(heading() .. "Social|r")
   stat("Waves", "waves")
   stat("Cheers", "cheers")
   stat("Hugs", "hugs")
@@ -284,7 +291,7 @@ function Tab.Places(db, add)
   end
   add(("%d places visited"):format(#places))
   add(" ")
-  add(gold .. "Share of your time|r")
+  add(heading() .. "Share of your time|r")
   -- Share first, so a long place name can wrap without splitting the number
   for i = 1, math.min(10, #places) do
     local z = places[i]
@@ -292,7 +299,7 @@ function Tab.Places(db, add)
   end
   if (db.deathsSeen or 0) > 0 then
     add(" ")
-    add(gold .. "Where you die|r")
+    add(heading() .. "Where you die|r")
     for _, z in ipairs(T.TopN(db.deathZones or {}, 3)) do
       add(("%d%%  %s"):format(pctOf(z.v, db.deathsSeen), z.k))
     end
@@ -300,7 +307,7 @@ function Tab.Places(db, add)
   local towns = T.TopN(db.idleZones, 3)
   if #towns > 0 then
     add(" ")
-    add(gold .. "Where you stand around|r")
+    add(heading() .. "Where you stand around|r")
     for _, z in ipairs(towns) do add(("%s - %s"):format(z.k, T.FmtTime(z.v))) end
   end
 end
@@ -319,7 +326,7 @@ function Tab.Roster(_, add)
   local total = 0
   for _, c in ipairs(ordered) do total = total + (w[c.key] or 0) end
 
-  add(gold .. "Your characters|r")
+  add(heading() .. "Your characters|r")
   for _, c in ipairs(ordered) do
     if c.stale then
       add(("%s%s|r"):format(grey, c.title or c.name))
@@ -336,14 +343,14 @@ function Tab.Roster(_, add)
   local who = R.Comparisons(list)
   if #who > 0 then
     add(" ")
-    add(gold .. "Who's who|r")
+    add(heading() .. "Who's who|r")
     for _, line in ipairs(who) do add(line) end
   end
 
   local traits = R.AccountTraits(list)
   if #traits > 0 then
     add(" ")
-    add(gold .. "Your account|r")
+    add(heading() .. "Your account|r")
     for _, t in ipairs(traits) do
       add(("%s%s.|r %s"):format(blue, t.label, t.text))
     end

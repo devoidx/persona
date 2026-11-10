@@ -116,7 +116,9 @@ assert calls(lua, "CloseButton", u.close)
 assert calls(lua, "Button", u.share) and calls(lua, "Button", u.toggle), "Share and Persona buttons"
 assert len(calls(lua, "Font")) >= 3 + 6, "title, subtitle, body and the six tab labels"
 assert list(ns.accent.values()) == [0.2, 0.6, 1], "tab accent from the theme"
-print("ok: panel handed to EllesmereUI at login; accent colour applied to tabs")
+ns.SetPanel(True); ns.SetTab("Habits")
+assert "|cff3399ff" in u.body.text and "|cffffd100" not in u.body.text, "headings in the theme accent, not Blizzard gold"
+print("ok: panel handed to EllesmereUI at login; accent colour applied to tabs and headings")
 
 # 2. Share box opened after login is styled when built
 ns.share.Show()
@@ -134,4 +136,5 @@ print("ok: live theme change updates the tab accent")
 lua, ns = start(False)
 assert list(ns.accent.values()) == [1, 0.82, 0]
 ns.share.Show(); ns.SetPanel(True); ns.SetTab("Habits")
+assert "|cffffd100" in ns.ui.body.text, "default headings stay Blizzard gold"
 print("ok: without EllesmereUI nothing changes")

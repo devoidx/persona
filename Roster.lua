@@ -123,18 +123,25 @@ function R.Comparisons(list)
     if not c.stale and (c.tracked or 0) >= T.MIN_TRACKED then qualified[#qualified + 1] = c end
   end
   if #qualified < 2 then return {} end
+  -- Who holds each trait most strongly
   local best = {}
   for _, c in ipairs(qualified) do
     for id, score in pairs(c.scores or {}) do
       if WORDS[id] and (not best[id] or score > best[id].score) then
-        best[id] = { name = c.name, score = score }
+        best[id] = { key = c.key, name = c.name, score = score }
       end
     end
   end
-  local lines = {}
+  -- One line per character: the trait they're most known for. A long-played
+  -- main would otherwise win nearly every trait and fill the whole list.
+  local mine = {}
   for id, b in pairs(best) do
-    lines[#lines + 1] = { score = b.score, text = ("%s is your %s one."):format(b.name, WORDS[id]) }
+    if not mine[b.key] or b.score > mine[b.key].score then
+      mine[b.key] = { score = b.score, text = ("%s is your %s one."):format(b.name, WORDS[id]) }
+    end
   end
+  local lines = {}
+  for _, l in pairs(mine) do lines[#lines + 1] = l end
   table.sort(lines, function(a, b) return a.score > b.score end)
   local out = {}
   for i = 1, math.min(8, #lines) do out[i] = lines[i].text end

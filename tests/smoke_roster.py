@@ -127,10 +127,13 @@ assert "Level 80, 71% of your time" in plain, plain          # 15h of 21h observ
 assert "playing now" in plain
 assert "Not seen for 90 days" in plain
 assert "Zugzwang is your restless one." in plain, plain       # Elowen scores higher but is stale
-assert "Zugzwang is your critter-hunting one." in plain
+assert "Zugzwang is your critter-hunting one." not in plain, "one line per character: her strongest trait only"
+who = plain.split("Who's who", 1)[1].split("Your account", 1)[0]
+for name in ("Zugzwang", "Thrall", "Elowen"):
+    assert who.count(name) <= 1, f"{name} appears more than once in Who's who:\n{who}"
 assert "Elowen is your" not in plain
 assert "{" not in plain and "nil" not in plain, plain
-print("ok: list, colours, order, shares, stale character, comparisons")
+print("ok: list, colours, order, shares, stale character, one Who's who line per character")
 
 # 3. /played used only when every active character has it
 lua, ns, text = start("{" + char("Zugzwang", "HUNTER", 15 * 3600, {}, played=4000 * 3600) + "}")
