@@ -1,5 +1,9 @@
 # Persona
 
+## v0.7.1
+- Share your profile: the Share button (or /persona share) gives you a copy-ready
+  version for Discord or in-game chat.
+
 ## v0.7.0
 - Class and racial signature moves: Taxi Service, Drama Queen, Hiding From Nobody,
   Never Owned a Horse, Lurker and more, counted outside combat only.
