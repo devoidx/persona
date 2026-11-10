@@ -72,7 +72,9 @@ VETERAN = """{ tracked = 6 * 3600, travel = 40 * 60, onFoot = 30 * 60, travelJum
   idleResting = 1800, idleZones = { ["Oribos"] = 1500, ["Valdrakken"] = 300 },
   falls = 9, fallYards = 331, longestFall = 3.5,
   hours = { [1] = 3 * 3600, [20] = 3 * 3600 }, days = { [0] = 4 * 3600, [3] = 2 * 3600 },
-  emotes = { DANCE = 6, BOW = 3, WAVE = 1 }, emoteTotal = 10, soloDances = 2, panelOpen = false }"""
+  emotes = { DANCE = 6, BOW = 3, WAVE = 1 }, emoteTotal = 10, soloDances = 2, panelOpen = false,
+  bagSamples = 100, bagFull = 87, deathsSeen = 4, deathZones = { ["Oribos"] = 3, ["Valdrakken"] = 1 },
+  afkCount = 1, afkTime = 754 }"""
 
 FRESH = """{ tracked = 0, travel = 0, onFoot = 0, travelJumps = 0, totalJumps = 0, mounted = 0, mounts = {},
   zones = {}, idleResting = 0, idleZones = {}, falls = 0, fallYards = 0, longestFall = 0,
@@ -117,14 +119,16 @@ ns, check = start(VETERAN, VETERAN_STATS)
 check("Profile", "Observed 6h 0m since install", "Menace to Wildlife", absent=("and more quirks",))
 check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.0 a minute",
       "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
-      "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos")
+      "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos",
+      "Bags: 87% full on average", "AFK: once, 12m in total")
 check("Emotes", "10 emotes, 3 different", "/dance - 6 (60%)", "Danced alone: twice")
 ns.db.soloDances = 1
 check("Emotes", "Danced alone: once")
 ns.db.soloDances = 3
 check("Emotes", "Danced alone: 3 times")
 check("Lifetime", "Deaths: 2901 (69 from falling)", "Abandoned: 4252 (20%)", "LOLs: 0", "World's smallest violin: 0")
-check("Places", "3 places visited", "33%  Bastion - Temple of Devotion", "Where you stand around")
+check("Places", "3 places visited", "33%  Bastion - Temple of Devotion", "Where you stand around",
+      "Where you die", "75%  Oribos", "25%  Valdrakken")
 ns.SetPanel(False); ns.SetPanel(True)
 assert ns.db.panelTab == "Places", "last tab remembered"
 ns.SetTab("Bogus"); assert ns.db.panelTab == "Places", "unknown tab ignored"
@@ -137,5 +141,5 @@ check("Profile", "Thrall", absent=("Menace", "Watching for"))
 for tab, want in (("Habits", "No riding recorded yet."), ("Habits", "Nothing recorded yet."),
                   ("Emotes", "No emotes yet."), ("Lifetime", "no Statistics panel"),
                   ("Places", "Nowhere recorded yet.")):
-    check(tab, want)
+    check(tab, want, absent=("Bags:", "AFK:", "Where you die"))
 print("ok: brand-new character, every tab has an empty state")

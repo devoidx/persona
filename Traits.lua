@@ -166,6 +166,8 @@ local COPY = {
       "{name} cannot walk anywhere without bouncing: {n} jumps a minute on the road.",
       "Somewhere, a physics engine is tired. {name} jumps {n} times a minute while travelling.",
       "{name} treats every road as a trampoline. {n} jumps a minute, and no sign of stopping.",
+      "Walking is for other people. {name} hops along at {n} jumps a minute.",
+      "{n} jumps a minute on the move. {name}'s knees have filed a complaint.",
     },
   },
   grounded = {
@@ -174,6 +176,9 @@ local COPY = {
     lines = {
       "{name} walks like someone with places to be. Barely {n} jumps a minute.",
       "Feet on the ground, always. {name} manages {n} jumps a minute on the move.",
+      "{name} keeps both feet on the ground: {n} jumps a minute, if that.",
+      "Jumping is beneath {name}. {n} jumps a minute on the road.",
+      "{name} travels with quiet dignity. {n} jumps a minute, all of them necessary.",
     },
   },
   cityslicker = {
@@ -183,6 +188,8 @@ local COPY = {
       "{name} spends {p}% of {his} time standing perfectly still in town, mostly in {place}. Waiting for something. Or someone.",
       "Need {name}? Try {place}. {p}% of {his} playtime is spent in town doing absolutely nothing.",
       "{p}% of {name}'s life is spent idling in town. The guards in {place} know {his} face by now.",
+      "{name} could give tours of {place}. {p}% of {his} time is spent standing around in town.",
+      "Some adventurers adventure. {name} stands in {place}: {p}% of all {his} time, idle in town.",
     },
   },
   homebody = {
@@ -191,6 +198,9 @@ local COPY = {
     lines = {
       "{name} has a favourite spot: {place}. {p}% of {his} life happens there.",
       "{name} keeps coming back to {place}: {p}% of all {his} time is spent there.",
+      "{place} is where {name} feels at home: {p}% of {his} time is spent there.",
+      "All roads lead {name} back to {place}: {p}% of {his} time.",
+      "{name} could draw {place} from memory. {p}% of {his} life happens there.",
     },
   },
   wanderer = {
@@ -199,6 +209,9 @@ local COPY = {
     lines = {
       "{name} has set foot in {n} different places and shows no sign of stopping.",
       "{n} places visited. {name} doesn't stay anywhere long.",
+      "{name} has seen {n} different corners of the world and wants to see more.",
+      "{n} places and counting. Staying put isn't {name}'s style.",
+      "Maps were made for people like {name}: {n} places visited so far.",
     },
   },
   loyal = {
@@ -207,6 +220,9 @@ local COPY = {
     lines = {
       "{name} and {mount} are inseparable: {p}% of all riding time.",
       "Other mounts exist. {name} has heard of them. Still rides {mount} {p}% of the time.",
+      "{name} rides {mount} {p}% of the time. The rest of the stable is gathering dust.",
+      "Whatever the journey, {name} takes {mount}: {p}% of all riding time.",
+      "{mount} has carried {name} for {p}% of all {his} riding. True love.",
     },
   },
   collector = {
@@ -215,6 +231,9 @@ local COPY = {
     lines = {
       "{name} can't pick a favourite. {n} different mounts ridden so far.",
       "A mount for every mood: {name} has ridden {n} of them.",
+      "{name} has ridden {n} different mounts. The stable master sends a card every holiday.",
+      "{n} mounts ridden. {name} believes every outfit needs a matching mount.",
+      "Why ride one mount when {name} can ride {n}?",
     },
   },
   pedestrian = {
@@ -223,6 +242,9 @@ local COPY = {
     lines = {
       "{name} owns mounts but prefers to walk. {p}% of {his} ground travel is on foot.",
       "Mounts are for other people. {name} walks {p}% of the way.",
+      "{name} walks {p}% of the way. The mounts wait patiently at home.",
+      "{p}% of {name}'s travel happens on foot. Bootmakers love {name}.",
+      "{name} prefers to see the world at walking pace: {p}% of {his} ground travel is on foot.",
     },
   },
   gravityfan = {
@@ -231,6 +253,9 @@ local COPY = {
     lines = {
       "{name} has fallen roughly {n} yards. Nobody has asked why.",
       "Gravity and {name} go way back: about {n} yards fallen.",
+      "About {n} yards fallen so far. {name} takes the scenic route down.",
+      "{name} has dropped roughly {n} yards. Stairs are for the cautious.",
+      "Roughly {n} yards of falling. {name} and the ground keep meeting unexpectedly.",
     },
   },
   leap = {
@@ -239,6 +264,9 @@ local COPY = {
     lines = {
       "{name}'s longest fall lasted {n} seconds. Long enough to reconsider several decisions.",
       "{n} seconds in free fall, once. {name} still talks about it.",
+      "{name} once fell for {n} seconds and landed on {his} feet. Probably.",
+      "The record: {n} seconds of free fall. {name} calls it a shortcut.",
+      "{n} seconds in the air, once. {name} had time to think about lunch.",
     },
   },
   gravityvictim = {
@@ -247,6 +275,9 @@ local COPY = {
     lines = {
       "The floor has killed {name} {f} times. That's {p}% of all {his} deaths.",
       "{p}% of {name}'s {d} deaths were the floor's fault, not the enemy's.",
+      "{name} has been killed by the floor {f} times: {p}% of all {his} deaths.",
+      "Bosses, dragons, demons: none of them have killed {name} like the ground has. {f} times so far.",
+      "{p}% of {name}'s deaths came from falling. The floor remains undefeated.",
     },
   },
   -- Lifetime statistics
@@ -256,6 +287,9 @@ local COPY = {
     lines = {
       "{name} has abandoned {n} quests, {p}% of every quest {his} journal has ever held.",
       "{n} quests abandoned. {name} prefers to keep {his} options open.",
+      "{name} has a habit of starting things. {n} quests abandoned so far.",
+      "{n} quests left unfinished. {name} will get back to them. Probably.",
+      "Quest givers across Azeroth are still waiting on {name}: {n} quests abandoned.",
     },
   },
   menace = {
@@ -264,6 +298,9 @@ local COPY = {
     lines = {
       "{n} critters have died at {name}'s hands. The rabbits speak of {name} only in whispers.",
       "{name} has killed {n} critters. None of them were a threat.",
+      "{name} has killed {n} critters. The squirrels have started a support group.",
+      "{n} critters lost to {name}. None of them saw it coming.",
+      "Rabbits, frogs, squirrels: {n} of them, all by {name}'s hand.",
     },
   },
   hugger = {
@@ -272,6 +309,9 @@ local COPY = {
     lines = {
       "{name} has hugged {n} times. Nobody is safe.",
       "{n} hugs given. {name} is a lot, but in a nice way.",
+      "{n} hugs and counting. {name} has never met a stranger.",
+      "{name} has hugged {n} times. Personal space is a suggestion.",
+      "Everyone gets a hug from {name}. {n} so far.",
     },
   },
   joker = {
@@ -280,6 +320,9 @@ local COPY = {
     lines = {
       "{name} has /lol'd {n} times. Not everything was that funny.",
       "{n} laughs on record. {name} is a generous audience.",
+      "{name} laughs easily: {n} laughs so far.",
+      "{n} times, {name} has found something hilarious. Usually a wipe.",
+      "Tell {name} a joke. Any joke. {n} laughs on record.",
     },
   },
   exasperated = {
@@ -288,6 +331,9 @@ local COPY = {
     lines = {
       "{name} has facepalmed {n} times. Group content has not been kind.",
       "{n} facepalms. {name} has seen things.",
+      "{n} facepalms on record. {name} expected better from all of you.",
+      "{name} has facepalmed {n} times. Some of them were deserved.",
+      "Every facepalm tells a story. {name} has {n} of them.",
     },
   },
   friendly = {
@@ -296,6 +342,9 @@ local COPY = {
     lines = {
       "{name} has waved {n} times. Strangers included.",
       "{n} waves and counting. {name} greets everyone.",
+      "{n} waves on record. {name} never passes anyone without saying hello.",
+      "{name} has waved {n} times. Most of them were waved back.",
+      "Hello, hello, hello: {name} has waved {n} times.",
     },
   },
   cheerleader = {
@@ -304,6 +353,9 @@ local COPY = {
     lines = {
       "{name} has cheered {n} times. Every win counts, apparently.",
       "{n} cheers on record. {name} is everyone's biggest fan.",
+      "{name} has cheered {n} times. No achievement goes unnoticed.",
+      "{n} cheers so far. {name} brings the energy.",
+      "Someone has to celebrate. {name} has cheered {n} times.",
     },
   },
   sardonic = {
@@ -312,6 +364,9 @@ local COPY = {
     lines = {
       "{name} has played the world's smallest violin {n} times. Sympathy is in short supply.",
       "{n} tiny violin performances. {name} has heard your complaint.",
+      "{name} keeps a very small violin ready at all times. {n} performances so far.",
+      "{n} renditions of the world's smallest violin. {name} has heard it all before.",
+      "Your complaint has been noted. {name} has played the tiny violin {n} times.",
     },
   },
   stoneface = {
@@ -321,6 +376,8 @@ local COPY = {
       "{n} hours played, and {name} has never once /lol'd.",
       "{name} has seen everything Azeroth has to offer in {n} hours. None of it was funny.",
       "{n} hours. Not a single laugh. {name} is a tough crowd.",
+      "{n} hours in Azeroth, and not one /lol. {name} is very hard to impress.",
+      "Gnomes, goblins, murlocs: {n} hours of it, and {name} has never laughed once.",
     },
   },
   -- Emotes (counted since install)
@@ -330,6 +387,9 @@ local COPY = {
     lines = {
       "{name}'s signature move is {emote}, used {n} times and counting.",
       "Ask {name} anything. The answer is usually {emote} ({n} times so far).",
+      "{name} says it best with {emote}: {n} times so far.",
+      "{emote} is {name}'s go-to. {n} times and counting.",
+      "If {name} had a catchphrase, it would be {emote}. Used {n} times.",
     },
   },
   dancer = {
@@ -338,6 +398,9 @@ local COPY = {
     lines = {
       "{name} has danced {n} times, {p}% of all {his} emotes.",
       "When in doubt, {name} dances. {n} times and counting.",
+      "{name} dances first and asks questions later. {n} dances so far.",
+      "{p}% of {name}'s emotes are dancing. Every occasion is a dance occasion.",
+      "{n} dances on record. {name} doesn't need music.",
     },
   },
   polite = {
@@ -346,6 +409,9 @@ local COPY = {
     lines = {
       "{p}% of {name}'s emotes are bows, thanks and salutes. Somebody raised {name} well.",
       "{name} is unfailingly polite: {p}% of all emotes are courtesies.",
+      "{name} always minds {his} manners: {p}% of all emotes are courtesies.",
+      "Bow, thank, salute: {p}% of {name}'s emotes. A credit to the realm.",
+      "{p}% of {name}'s emotes are polite ones. Grandma would be proud.",
     },
   },
   rude = {
@@ -354,6 +420,9 @@ local COPY = {
     lines = {
       "{p}% of {name}'s emotes are rude. The innkeepers have been warned.",
       "{name} communicates mainly in rude gestures: {p}% of all emotes.",
+      "{name} has a gesture for every occasion, and {p}% of them are rude.",
+      "{p}% of {name}'s emotes are rude. The tavern keeps a portrait behind the bar.",
+      "Manners are optional for {name}: {p}% of all emotes are rude ones.",
     },
   },
   solodancer = {
@@ -362,6 +431,54 @@ local COPY = {
     lines = {
       "{name} has danced alone {n} times. No target, no group, no audience.",
       "{n} solo dances. {name} doesn't need anyone else to have a good time.",
+      "{n} dances, nobody watching. {name} dances for the joy of it.",
+      "No partner, no group, no problem. {name} has danced alone {n} times.",
+      "{name} has danced solo {n} times. The best audience is no audience.",
+    },
+  },
+  -- Bags, deaths and breaks (observed since install)
+  hoarder = {
+    label = "Hoarder",
+    epithet = "{name} the Packrat",
+    lines = {
+      "{name}'s bags are {p}% full on average. Nothing gets thrown away.",
+      "Every slot spoken for: {name}'s bags average {p}% full.",
+      "{name} might need that later. Bags {p}% full, on average.",
+      "{p}% full, all the time. {name}'s bags are a museum.",
+      "{name} has never met a grey item {his} bags couldn't hold. {p}% full on average.",
+    },
+  },
+  travelslight = {
+    label = "Travels Light",
+    epithet = "{name} the Unburdened",
+    lines = {
+      "{name}'s bags are only {p}% full on average. Everything has a place, and most places are empty.",
+      "{name} sells everything. Bags average just {p}% full.",
+      "Light bags, light heart: {name}'s bags sit at {p}% full.",
+      "Only {p}% full. {name} vendors first and asks questions never.",
+      "{name} carries only what matters. Bags {p}% full on average.",
+    },
+  },
+  nemesis = {
+    label = "Nemesis",
+    epithet = "{name}, Doomed in {place}",
+    lines = {
+      "{place} has it in for {name}: {n} of {his} {d} recent deaths happened there.",
+      "{name} has died {n} times in {place}. It's starting to feel personal.",
+      "Of {name}'s {d} recent deaths, {n} were in {place}. Every story needs a villain.",
+      "{place} has claimed {name} {n} times. The spirit healer waves hello.",
+      "{n} deaths in {place} alone. {name} keeps going back anyway.",
+    },
+  },
+  wandersoff = {
+    label = "Easily Distracted",
+    epithet = "{name} the Elsewhere",
+    lines = {
+      "{name} has gone AFK {n} times. {p}% of {his} time online is spent somewhere else.",
+      "Back in five. {name} has said it {n} times, and been away for {t} in total.",
+      "{p}% of {name}'s playtime is AFK. The kettle needs a lot of attention.",
+      "{name} has wandered off {n} times. Azeroth waits patiently.",
+      "{t} AFK across {n} breaks. {name} has a life outside Azeroth, apparently.",
     },
   },
   -- When they play
@@ -371,6 +488,9 @@ local COPY = {
     lines = {
       "{p}% of {name}'s adventures happen between midnight and 5am. Sleep is for NPCs.",
       "{name} does {his} best work after midnight: {p}% of all play.",
+      "{p}% of {name}'s play happens after midnight. The moon knows {name} well.",
+      "While the world sleeps, {name} plays: {p}% of all adventures happen between midnight and 5am.",
+      "{name} keeps vampire hours. {p}% of {his} play is between midnight and 5am.",
     },
   },
   earlybird = {
@@ -379,6 +499,9 @@ local COPY = {
     lines = {
       "{name} is up before the world: {p}% of play happens between 5am and 9am.",
       "{p}% of {name}'s adventures start before breakfast.",
+      "{name} logs in with the sunrise. {p}% of play happens between 5am and 9am.",
+      "Coffee, then Azeroth. {p}% of {name}'s play happens between 5am and 9am.",
+      "{p}% of {name}'s adventures start between 5am and 9am. The early bird gets the loot.",
     },
   },
   weekender = {
@@ -387,6 +510,9 @@ local COPY = {
     lines = {
       "{name} saves the world on weekends: {p}% of {his} play is Saturday and Sunday.",
       "Weekdays belong to someone else. {p}% of {name}'s play happens at the weekend.",
+      "{p}% of {name}'s play is on Saturdays and Sundays. The weekend is sacred.",
+      "Monday to Friday, {name} is somebody else. {p}% of play happens at the weekend.",
+      "{name} saves Azeroth on weekends: {p}% of all play.",
     },
   },
 }
@@ -509,6 +635,32 @@ function T.Build(db)
     -- Weekends are 2/7 (29%) of the week, so 60% is a real lean, not chance
     if patterns and weekend >= 0.6 then
       add("weekender", weekend / 0.6, { p = pct(weekend) })
+    end
+
+    -- Bags: an hour of once-a-minute samples
+    if (db.bagSamples or 0) >= 60 then
+      local full = db.bagFull / db.bagSamples
+      if full >= 0.9 then
+        add("hoarder", 1 + (full - 0.9) * 10, { p = pct(full) })
+      elseif full <= 0.35 then
+        add("travelslight", 1 + (0.35 - full) * 4, { p = pct(full) })
+      end
+    end
+
+    -- Where you die: 5+ observed deaths, 40%+ of them in one place
+    if (db.deathsSeen or 0) >= 5 then
+      local spot, n = top(db.deathZones or {})
+      if spot and n >= 3 and n / db.deathsSeen >= 0.4 then
+        add("nemesis", (n / db.deathsSeen) / 0.4, { n = n, d = db.deathsSeen, place = placeName(spot) })
+      end
+    end
+
+    -- AFK: 3h observed, 5+ breaks, 10%+ of the time away
+    if db.tracked >= T.MIN_PATTERN and (db.afkCount or 0) >= 5 then
+      local share = (db.afkTime or 0) / db.tracked
+      if share >= 0.1 then
+        add("wandersoff", share / 0.1, { n = db.afkCount, p = pct(share), t = T.FmtTime(db.afkTime) })
+      end
     end
 
     -- Jumping while travelling

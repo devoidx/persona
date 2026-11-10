@@ -154,6 +154,13 @@ function Tab.Habits(db, add)
   local town = T.TopN(db.idleZones, 1)[1]
   add(("Idle in towns: %s"):format(T.FmtTime(db.idleResting)))
   if town then add(("Mostly in %s"):format(town.k)) end
+  if (db.bagSamples or 0) > 0 then
+    add(("Bags: %d%% full on average"):format(pctOf(db.bagFull, db.bagSamples)))
+  end
+  if (db.afkCount or 0) > 0 then
+    add(("AFK: %s, %s in total"):format(db.afkCount == 1 and "once" or db.afkCount == 2 and "twice"
+      or (num(db.afkCount) .. " times"), T.FmtTime(db.afkTime)))
+  end
 
   add(" ")
   add(gold .. "When you play|r")
@@ -253,6 +260,13 @@ function Tab.Places(db, add)
   for i = 1, math.min(10, #places) do
     local z = places[i]
     add(("%d%%  %s"):format(pctOf(z.v, db.tracked), z.k))
+  end
+  if (db.deathsSeen or 0) > 0 then
+    add(" ")
+    add(gold .. "Where you die|r")
+    for _, z in ipairs(T.TopN(db.deathZones or {}, 3)) do
+      add(("%d%%  %s"):format(pctOf(z.v, db.deathsSeen), z.k))
+    end
   end
   local towns = T.TopN(db.idleZones, 3)
   if #towns > 0 then

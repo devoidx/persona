@@ -16,6 +16,9 @@ The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emot
 | Idling in town | Stationary while `IsResting()` |
 | Falls | `IsFalling()` duration, distance estimated from free-fall time |
 | When you play | Local hour and weekday |
+| Bag fullness | Backpack and ordinary bags, sampled once a minute (profession and reagent bags left out) |
+| Where you die | `PLAYER_DEAD` plus current place |
+| AFK breaks | `PLAYER_FLAGS_CHANGED` plus `UnitIsAFK` |
 | Lifetime habits | Statistics panel (deaths, falling deaths, emotes, critters, abandoned quests) |
 
 Everything is stored per character in `PersonaDB`. No combat data is read, so it is unaffected by Midnight's secret-value restrictions.

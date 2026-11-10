@@ -37,6 +37,12 @@ local DEFAULTS = {
   falls = 0,
   longestFall = 0,
   fallYards = 0,             -- estimated
+  bagSamples = 0,            -- once-a-minute samples of bag fullness
+  bagFull = 0,               -- sum of fullness (0-1) over those samples
+  deathsSeen = 0,            -- deaths observed since install
+  deathZones = {},           -- ["Zone - Subzone"] = deaths there
+  afkCount = 0,
+  afkTime = 0,               -- seconds flagged AFK
   emotes = {},               -- [TOKEN] = times performed, e.g. DANCE, BOW
   emoteTotal = 0,
   soloDances = 0,            -- /dance with no target while not grouped
@@ -86,6 +92,41 @@ local zoneKey, zoneName = nil, nil
 local currentMount, lastMountScan = nil, 0
 local fallStart = nil
 local clockHour, clockDay, clockCheck = nil, nil, 0
+local bagCheck, afkSince = 0, nil
+local BAG_EVERY = 60
+
+-- Fullness of the backpack and ordinary bags. Profession bags (non-zero
+-- family) and the reagent bag are left out: they fill up by design.
+local function sampleBags()
+  if not (C_Container and C_Container.GetContainerNumSlots) then return end
+  local total, free = 0, 0
+  for bag = 0, (NUM_BAG_SLOTS or 4) do
+    local slots = C_Container.GetContainerNumSlots(bag) or 0
+    if slots > 0 then
+      local f, family = C_Container.GetContainerNumFreeSlots(bag)
+      if (family or 0) == 0 then
+        total = total + slots
+        free = free + (f or 0)
+      end
+    end
+  end
+  if total > 0 then
+    db.bagSamples = db.bagSamples + 1
+    db.bagFull = db.bagFull + (total - free) / total
+  end
+end
+
+local function afkChanged(now)
+  local afk = UnitIsAFK("player")
+  if isSecret(afk) then return end
+  if afk and not afkSince then
+    afkSince = now
+    db.afkCount = db.afkCount + 1
+  elseif not afk and afkSince then
+    db.afkTime = db.afkTime + (now - afkSince)
+    afkSince = nil
+  end
+end
 
 local function updateZone()
   zoneName = GetRealZoneText() or ""
@@ -146,6 +187,11 @@ local function onUpdate(_, elapsed)
   local now = GetTime()
   db.tracked = db.tracked + dt
   bump(db.zones, zoneKey, dt)
+
+  if now - bagCheck >= BAG_EVERY then
+    bagCheck = now
+    sampleBags()
+  end
 
   -- Local clock: refresh at most once a minute
   if now - clockCheck >= 60 or not clockHour then
@@ -259,6 +305,9 @@ Core:RegisterEvent("ZONE_CHANGED_INDOORS")
 Core:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 Core:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
 Core:RegisterEvent("TIME_PLAYED_MSG")
+Core:RegisterEvent("PLAYER_DEAD")
+Core:RegisterEvent("PLAYER_FLAGS_CHANGED")
+Core:RegisterEvent("PLAYER_LOGOUT")
 
 Core:SetScript("OnEvent", function(self, event, arg1, ...)
   if event == "ADDON_LOADED" and arg1 == ADDON then
@@ -286,6 +335,19 @@ Core:SetScript("OnEvent", function(self, event, arg1, ...)
       db.played = arg1
       db.playedAt = time()
       if ns.Refresh then ns.Refresh() end
+    end
+  elseif event == "PLAYER_DEAD" then
+    if db then
+      db.deathsSeen = db.deathsSeen + 1
+      bump(db.deathZones, zoneKey, 1)
+    end
+  elseif event == "PLAYER_FLAGS_CHANGED" then
+    if db and arg1 == "player" then afkChanged(GetTime()) end
+  elseif event == "PLAYER_LOGOUT" then
+    -- Logging out while AFK: count the time up to now
+    if db and afkSince then
+      db.afkTime = db.afkTime + (GetTime() - afkSince)
+      afkSince = nil
     end
   else -- zone events
     updateZone()

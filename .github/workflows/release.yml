@@ -38,6 +38,8 @@ jobs:
           python -I tests/smoke_minimap.py Traits.lua UI.lua
           python -I tests/smoke_tabs.py Traits.lua UI.lua
           python -I tests/smoke_roster.py
+          python -I tests/smoke_core_events.py Core.lua
+          python -I tests/check_copy.py Traits.lua
 
       - uses: BigWigsMods/packager@v2
         with:

@@ -23,6 +23,7 @@ local WORDS = {
   sardonic = "sarcastic", stoneface = "stone-faced", dancer = "dancing",
   polite = "polite", rude = "rude", solodancer = "solo-dancing",
   nightowl = "nocturnal", earlybird = "early-rising", weekender = "weekend",
+  hoarder = "hoarding", travelslight = "tidy", wandersoff = "easily distracted",
 }
 
 local function isSecret(v) return issecretvalue ~= nil and issecretvalue(v) end
