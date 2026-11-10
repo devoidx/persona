@@ -162,6 +162,22 @@ function Tab.Habits(db, add)
       or (num(db.afkCount) .. " times"), T.FmtTime(db.afkTime)))
   end
 
+  -- Signature moves, only the ones actually used
+  local used = {}
+  for key, move in pairs(ns.moves and ns.moves.LIST or {}) do
+    local n = (db.moves or {})[key] or 0
+    if n > 0 then used[#used + 1] = { label = move.label, n = n } end
+  end
+  table.sort(used, function(a, b) return a.n > b.n end)
+  local formTravel, stealth = db.formTravel or 0, db.stealthTime or 0
+  if #used > 0 or formTravel > 0 or stealth > 0 then
+    add(" ")
+    add(gold .. "Signature moves|r")
+    for _, u in ipairs(used) do add(("%s: %s"):format(u.label, num(u.n))) end
+    if formTravel > 0 then add(("In animal form: %s"):format(T.FmtTime(formTravel))) end
+    if stealth > 0 then add(("Stealthed outside combat: %s"):format(T.FmtTime(stealth))) end
+  end
+
   add(" ")
   add(gold .. "When you play|r")
   local function hours(from, to)
@@ -453,7 +469,10 @@ end
 SLASH_PERSONA1 = "/persona"
 SlashCmdList.PERSONA = function(msg)
   msg = strtrim(msg or ""):lower()
-  if msg == "stats" then
+  if msg == "moves" then
+    print("|cff66ccffPersona|r: signature moves counted on this character:")
+    for _, line in ipairs(ns.moves and ns.moves.Report() or {}) do print(line) end
+  elseif msg == "stats" then
     print("|cff66ccffPersona|r: lifetime statistics on this client:")
     T.DumpStats()
   elseif msg == "minimap" then

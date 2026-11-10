@@ -24,6 +24,9 @@ local WORDS = {
   polite = "polite", rude = "rude", solodancer = "solo-dancing",
   nightowl = "nocturnal", earlybird = "early-rising", weekender = "weekend",
   hoarder = "hoarding", travelslight = "tidy", wandersoff = "easily distracted",
+  taxi = "portal-opening", summoner = "summoning", nohorse = "four-legged", lurker = "sneaky",
+  dramaqueen = "dramatic", hider = "shadowy", wildrunner = "wild", rocketeer = "rocket-powered",
+  camper = "outdoorsy", soarer = "high-flying", stomper = "stompy", escapee = "slippery",
 }
 
 local function isSecret(v) return issecretvalue ~= nil and issecretvalue(v) end

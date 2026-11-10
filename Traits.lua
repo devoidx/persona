@@ -481,6 +481,139 @@ local COPY = {
       "{t} AFK across {n} breaks. {name} has a life outside Azeroth, apparently.",
     },
   },
+  -- Signature moves: class and racial abilities used outside combat (Moves.lua)
+  taxi = {
+    label = "Taxi Service",
+    epithet = "{name}, Keeper of Portals",
+    lines = {
+      "{name} has opened {n} portals. Most of them for strangers who didn't say thanks.",
+      "{n} portals and counting. {name} should really start charging.",
+      "Need a lift? {name} has opened {n} portals so far.",
+      "{name} has opened {n} portals. The fare is a bottle of water, apparently.",
+      "{n} portals opened. Somewhere, a queue is forming in front of {name}.",
+    },
+  },
+  summoner = {
+    label = "Summoning Circle",
+    epithet = "{name} the Summoner",
+    lines = {
+      "{name} has summoned {n} times. Nobody walks to the dungeon on {his} watch.",
+      "{n} summons cast. {name} is the reason the group arrived on time.",
+      "{name} has dragged people across Azeroth {n} times. Click the portal, please.",
+      "Ritual of Summoning, {n} times. {name} just needs two more clicks.",
+      "{n} summons and counting. Every group needs someone like {name}.",
+    },
+  },
+  nohorse = {
+    label = "Never Owned a Horse",
+    epithet = "{name} the Shapeshifter",
+    lines = {
+      "{p}% of {name}'s ground travel happens in animal form. Mounts are for other people.",
+      "Why buy a mount? {name} covers {p}% of the road on four legs of {his} own.",
+      "{name} prefers {his} own legs, all four of them: {p}% of ground travel in animal form.",
+      "{p}% of the time, {name} gets around in animal form. The stable master has given up.",
+      "{name} has never needed a saddle. {p}% of {his} ground travel is in animal form.",
+    },
+  },
+  lurker = {
+    label = "Lurker",
+    epithet = "{name} the Unseen",
+    lines = {
+      "{name} spends {p}% of {his} time stealthed, mostly hiding from nobody in particular.",
+      "{t} spent in stealth outside combat. {name} likes to watch.",
+      "You might not have seen {name}. That's the point: {p}% of {his} time is spent stealthed.",
+      "{p}% of {name}'s time is spent out of sight. Old habits.",
+      "{name} has lurked for {t} without a fight in sight.",
+    },
+  },
+  dramaqueen = {
+    label = "Drama Queen",
+    epithet = "{name} the Melodramatic",
+    lines = {
+      "{name} has played dead {n} times with nothing attacking. Very convincing.",
+      "{n} Feign Deaths with no enemy in sight. {name} just likes lying down.",
+      "{name} has collapsed dramatically {n} times for no reason at all.",
+      "{n} times, {name} has dropped dead in front of nobody. An award-worthy performance.",
+      "Nothing was attacking. {name} feigned death anyway, {n} times.",
+    },
+  },
+  hider = {
+    label = "Hiding From Nobody",
+    epithet = "{name} of the Shadows",
+    lines = {
+      "{name} has vanished into the shadows in town {n} times. Nobody was looking.",
+      "{n} Shadowmelds in the middle of town. {name} is avoiding someone.",
+      "{name} hides in plain sight: {n} Shadowmelds in town so far.",
+      "Shadowmeld, in town, {n} times. Whoever {name} is hiding from hasn't noticed.",
+      "{n} times, {name} has melted into the shadows at the bank. Very mysterious.",
+    },
+  },
+  wildrunner = {
+    label = "Runs With the Pack",
+    epithet = "{name} the Untamed",
+    lines = {
+      "{name} has dropped to all fours {n} times. Who needs a mount?",
+      "{n} times Running Wild. {name} prefers the original model.",
+      "{name} has run wild {n} times and counting. The tailor despairs.",
+      "Mounts are fine, but {name} has gone Running Wild {n} times.",
+      "{n} sprints on all fours. {name} hasn't fully settled into city life.",
+    },
+  },
+  rocketeer = {
+    label = "Rocket Commuter",
+    epithet = "{name} the Airborne",
+    lines = {
+      "{name} has rocket-jumped {n} times. Walking is so slow.",
+      "{n} Rocket Jumps outside combat. {name} commutes by explosion.",
+      "Why take the stairs? {name} has rocket-jumped {n} times.",
+      "{name} has launched into the air {n} times. Landing optional.",
+      "{n} rocket jumps and no injuries reported. {name} is very lucky.",
+    },
+  },
+  camper = {
+    label = "Happy Camper",
+    epithet = "{name} of the Campfire",
+    lines = {
+      "{name} has made camp {n} times. Anywhere can be home.",
+      "{n} camps pitched. {name} is always ready to put the kettle on.",
+      "{name} has set up camp {n} times. The inns are losing money.",
+      "Tent, fire, nap: {name} has made camp {n} times.",
+      "{n} campfires and counting. {name} never stays at an inn.",
+    },
+  },
+  soarer = {
+    label = "Born to Soar",
+    epithet = "{name} of the Skies",
+    lines = {
+      "{name} has taken to the skies {n} times. Mounts are for the wingless.",
+      "{n} Soars and counting. {name} doesn't do stairs.",
+      "{name} has soared {n} times. The ground is just somewhere to land.",
+      "Wings out, {n} times. {name} has never once waited for a flight path.",
+      "{n} take-offs. {name} has a complicated relationship with the ground.",
+    },
+  },
+  stomper = {
+    label = "Stomps for Fun",
+    epithet = "{name} the Thunderous",
+    lines = {
+      "{name} has War Stomped {n} times with nothing to stomp. The floor had it coming.",
+      "{n} War Stomps outside combat. {name} likes to make an entrance.",
+      "{name} stomps for fun: {n} times with no enemy in sight.",
+      "The ground shakes, {n} times, for no reason. That's just {name}.",
+      "{n} stomps and nobody stunned. {name} is just expressing {his} feelings.",
+    },
+  },
+  escapee = {
+    label = "Escape Artist",
+    epithet = "{name} the Slippery",
+    lines = {
+      "{name} has escaped {n} times from absolutely nothing.",
+      "{n} escapes, zero captors. {name} likes to stay in practice.",
+      "{name} has wriggled free {n} times. Nothing was holding on.",
+      "Escape Artist, used {n} times outside combat. {name} trusts nobody.",
+      "{n} times, {name} has escaped from an empty room.",
+    },
+  },
   -- When they play
   nightowl = {
     label = "Night Owl",
@@ -624,6 +757,20 @@ function T.Build(db)
     add("solodancer", 1 + 0.25 * math.log(solo / 25), { n = BreakUpLargeNumbers(solo) })
   end
 
+  -- Signature moves: counts only grow, so they're damped like lifetime statistics
+  local moves = db.moves or {}
+  local MOVE_TRAITS = {
+    { "taxi", "portal", 10 }, { "summoner", "summon", 10 }, { "dramaqueen", "feign", 10 },
+    { "hider", "shadowmeld", 10 }, { "wildrunner", "runwild", 20 }, { "rocketeer", "rocketjump", 25 },
+    { "camper", "camp", 10 }, { "soarer", "soar", 25 }, { "stomper", "stomp", 10 }, { "escapee", "escape", 10 },
+  }
+  for _, m in ipairs(MOVE_TRAITS) do
+    local n = moves[m[2]] or 0
+    if n >= m[3] then
+      add(m[1], 1 + 0.25 * math.log(n / m[3]), { n = BreakUpLargeNumbers(n) })
+    end
+  end
+
   if db.tracked >= T.MIN_TRACKED then
     -- When they play
     local night = sumRange(db.hours, 0, 4) / db.tracked
@@ -661,6 +808,19 @@ function T.Build(db)
       if share >= 0.1 then
         add("wandersoff", share / 0.1, { n = db.afkCount, p = pct(share), t = T.FmtTime(db.afkTime) })
       end
+    end
+
+    -- Animal-form travel: half the ground travel, and at least half an hour of it
+    local formTravel = db.formTravel or 0
+    if formTravel >= 1800 and db.travel > 0 and formTravel / db.travel >= 0.5 then
+      local share = formTravel / db.travel
+      add("nohorse", share / 0.5, { p = pct(share) })
+    end
+
+    -- Stealth outside combat: 10% of the time, at least half an hour
+    local stealth = db.stealthTime or 0
+    if stealth >= 1800 and stealth / db.tracked >= 0.1 then
+      add("lurker", (stealth / db.tracked) / 0.1, { p = pct(stealth / db.tracked), t = T.FmtTime(stealth) })
     end
 
     -- Jumping while travelling

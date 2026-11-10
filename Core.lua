@@ -43,6 +43,9 @@ local DEFAULTS = {
   deathZones = {},           -- ["Zone - Subzone"] = deaths there
   afkCount = 0,
   afkTime = 0,               -- seconds flagged AFK
+  moves = {},                -- signature moves (Moves.lua), counted out of combat
+  formTravel = 0,            -- seconds travelling in Travel Form / Ghost Wolf
+  stealthTime = 0,           -- seconds stealthed out of combat
   emotes = {},               -- [TOKEN] = times performed, e.g. DANCE, BOW
   emoteTotal = 0,
   soloDances = 0,            -- /dance with no target while not grouped
@@ -215,9 +218,16 @@ local function onUpdate(_, elapsed)
   end
 
   -- Ground travel
-  if speed and speed > 0 and not flying and not swimming then
+  local moving = speed and speed > 0 and not flying and not swimming
+  if moving then
     db.travel = db.travel + dt
-    if not mounted then db.onFoot = db.onFoot + dt end
+    -- Travel Form and Ghost Wolf are getting around, not walking
+    local inForm = ns.moves and ns.moves.InTravelForm()
+    if not mounted and not inForm then db.onFoot = db.onFoot + dt end
+  end
+  if ns.moves then
+    local inCombat = UnitAffectingCombat("player")
+    ns.moves.Sample(dt, moving, mounted, isSecret(inCombat) or inCombat)
   end
 
   -- Idle in resting areas (cities and inns)

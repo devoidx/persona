@@ -11,6 +11,11 @@ for m in re.finditer(r'\n  (\w+) = \{\n    label = "[^"]+",\n    epithet = "([^"
 supplied = {}
 for m in re.finditer(r'add\("(\w+)",[^{]*\{([^}]*)\}', src):
     supplied.setdefault(m.group(1), set()).update(re.findall(r'(\w+)\s*=', m.group(2)))
+# Signature moves are added from the MOVE_TRAITS table with { n = ... }
+mt = re.search(r"local MOVE_TRAITS = \{(.*?)\n  \}", src, re.S)
+if mt:
+    for tid in re.findall(r'\{ "(\w+)", "\w+", \d+ \}', mt.group(1)):
+        supplied.setdefault(tid, set()).add("n")
 # lifetime() fills in n itself
 for m in re.finditer(r'lifetime\("(\w+)"', src):
     supplied.setdefault(m.group(1), set()).add("n")

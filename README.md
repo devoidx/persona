@@ -19,6 +19,7 @@ The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emot
 | Bag fullness | Backpack and ordinary bags, sampled once a minute (profession and reagent bags left out) |
 | Where you die | `PLAYER_DEAD` plus current place |
 | AFK breaks | `PLAYER_FLAGS_CHANGED` plus `UnitIsAFK` |
+| Signature moves | Out-of-combat casts of a fixed list of class and racial spells (`UNIT_SPELLCAST_SUCCEEDED`), plus animal-form travel and stealth time |
 | Lifetime habits | Statistics panel (deaths, falling deaths, emotes, critters, abandoned quests) |
 
 Everything is stored per character in `PersonaDB`. No combat data is read, so it is unaffected by Midnight's secret-value restrictions.
@@ -27,6 +28,7 @@ Everything is stored per character in `PersonaDB`. No combat data is read, so it
 
 - `/persona`: toggle the panel
 - `/persona stats`: list which lifetime statistics this client provides
+- `/persona moves`: list the class and racial moves counted on this character
 - `/persona dock`: put the panel back beside the character frame after moving it
 - `/persona minimap`: hide or show the minimap button (Persona is also in the minimap's addons button)
 - `/persona forget Name`: remove a character from the roster (use `Name-Realm` if two share a name)

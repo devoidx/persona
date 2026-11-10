@@ -74,7 +74,7 @@ VETERAN = """{ tracked = 6 * 3600, travel = 40 * 60, onFoot = 30 * 60, travelJum
   hours = { [1] = 3 * 3600, [20] = 3 * 3600 }, days = { [0] = 4 * 3600, [3] = 2 * 3600 },
   emotes = { DANCE = 6, BOW = 3, WAVE = 1 }, emoteTotal = 10, soloDances = 2, panelOpen = false,
   bagSamples = 100, bagFull = 87, deathsSeen = 4, deathZones = { ["Oribos"] = 3, ["Valdrakken"] = 1 },
-  afkCount = 1, afkTime = 754 }"""
+  afkCount = 1, afkTime = 754, moves = { feign = 12, shadowmeld = 3 }, formTravel = 0, stealthTime = 600 }"""
 
 FRESH = """{ tracked = 0, travel = 0, onFoot = 0, travelJumps = 0, totalJumps = 0, mounted = 0, mounts = {},
   zones = {}, idleResting = 0, idleZones = {}, falls = 0, fallYards = 0, longestFall = 0,
@@ -88,6 +88,7 @@ def start(db, extra=""):
     ns = lua.table()
     load = lua.eval('function(src, name, ns) return load(src, name)("Persona", ns) end')
     load(open(sys.argv[1]).read(), "Traits.lua", ns)
+    load(open("Moves.lua").read(), "Moves.lua", ns)
     load(open(sys.argv[2]).read(), "UI.lua", ns)
     ns.db = lua.eval(db)
     ns.OnDBReady(ns.db)
@@ -120,7 +121,9 @@ check("Profile", "Observed 6h 0m since install", "Menace to Wildlife", absent=("
 check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.0 a minute",
       "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
       "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos",
-      "Bags: 87% full on average", "AFK: once, 12m in total")
+      "Bags: 87% full on average", "AFK: once, 12m in total",
+      "Signature moves", "Feign Death, nothing near: 12", "Shadowmeld in town: 3", "Stealthed outside combat: 10m",
+      absent=("In animal form",))
 check("Emotes", "10 emotes, 3 different", "/dance - 6 (60%)", "Danced alone: twice")
 ns.db.soloDances = 1
 check("Emotes", "Danced alone: once")
@@ -141,5 +144,5 @@ check("Profile", "Thrall", absent=("Menace", "Watching for"))
 for tab, want in (("Habits", "No riding recorded yet."), ("Habits", "Nothing recorded yet."),
                   ("Emotes", "No emotes yet."), ("Lifetime", "no Statistics panel"),
                   ("Places", "Nowhere recorded yet.")):
-    check(tab, want, absent=("Bags:", "AFK:", "Where you die"))
+    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves"))
 print("ok: brand-new character, every tab has an empty state")
