@@ -1,5 +1,11 @@
 # Persona
 
+## v0.7.0
+- Class and racial signature moves: Taxi Service, Drama Queen, Hiding From Nobody,
+  Never Owned a Horse, Lurker and more, counted outside combat only.
+- /persona moves lists every move Persona counts on your character.
+- Fixed: druids and shamans in travel form were counted as walking.
+
 ## v0.6.1
 - New traits: Hoarder, Travels Light, Nemesis (where you keep dying) and Easily Distracted.
 - Every trait now has five phrasings, so your profile reads differently from day to day.
