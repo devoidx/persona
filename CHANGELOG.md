@@ -1,5 +1,10 @@
 # Persona
 
+## v0.7.2
+- EllesmereUI users: Persona now matches your UI's look (window, buttons, fonts and accent colour).
+  Turn it off in EllesmereUI under Blizzard Skins+ > Window Skins > Third-Party Addons.
+- Who's who now gives each character one line: the trait they're most known for.
+
 ## v0.7.1
 - Share your profile: the Share button (or /persona share) gives you a copy-ready
   version for Discord or in-game chat.
