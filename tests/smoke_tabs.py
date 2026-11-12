@@ -60,7 +60,7 @@ RECORD_FONTSTRINGS = """
 """
 
 VETERAN_STATS = """
-  local stats = { [60] = "2,901", [114] = "69", [94] = "4,252", [98] = "17,339", [108] = "11,210",
+  local stats = { [60] = "2,901", [114] = "69", [94] = "4,252", [98] = "17,339", [107] = "310,170", [108] = "11,210",
     [1065] = "57", [1045] = "37", [1042] = "32", [1066] = "0", [1047] = "2", [1067] = "0" }
   function GetAchievementInfo(a, b) if b == nil and stats[a] then return a, "stat" end end
   function GetStatistic(id) return stats[id] end
@@ -120,7 +120,7 @@ def start(db, extra=""):
 
 # 1. Veteran character
 ns, check = start(VETERAN, VETERAN_STATS)
-check("Profile", "Observed 6h 0m since install", "Menace to Wildlife", absent=("and more quirks",))
+check("Profile", "Observed 6h 0m since install", "Menace to Wildlife", "Bloodthirsty", absent=("and more quirks",))
 check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.0 a minute",
       "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
       "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos",
@@ -133,7 +133,7 @@ ns.db.soloDances = 1
 check("Emotes", "Danced alone: once")
 ns.db.soloDances = 3
 check("Emotes", "Danced alone: 3 times")
-check("Lifetime", "Deaths: 2901 (69 from falling)", "Abandoned: 4252 (20%)", "LOLs: 0", "World's smallest violin: 0")
+check("Lifetime", "Creatures killed: 310170", "Deaths: 2901 (69 from falling)", "Abandoned: 4252 (20%)", "LOLs: 0", "World's smallest violin: 0")
 check("Places", "4 places visited", "Bastion (between places)", "Where you stand around",
       "Where you die", "75%  Oribos", "25%  Valdrakken", absent=("Oribos (between places)", "Valdrakken (between places)"))
 ns.SetPanel(False); ns.SetPanel(True)

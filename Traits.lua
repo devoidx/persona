@@ -137,6 +137,7 @@ T.STATS = {
   facepalms  = { id = 1047, title = "Total facepalms" },
   violins    = { id = 1067, title = "Total times playing world's smallest violin" },
   hugs       = { id = 1042, title = "Number of hugs" },
+  creatures  = { id = 107,  title = "Creatures killed" },
   critters   = { id = 108,  title = "Critters killed" },
   abandoned  = { id = 94,   title = "Quests abandoned" },
   completed  = { id = 98,   title = "Quests completed" },
@@ -326,6 +327,17 @@ local COPY = {
       "{name} has a habit of starting things. {n} quests abandoned so far.",
       "{n} quests left unfinished. {name} will get back to them. Probably.",
       "Quest givers across Azeroth are still waiting on {name}: {n} quests abandoned.",
+    },
+  },
+  bloodthirsty = {
+    label = "Bloodthirsty",
+    epithet = "{name} the Bloodthirsty",
+    lines = {
+      "{name} has killed {n} creatures. The graveyards are running out of room.",
+      "{n} creatures have fallen to {name}. Azeroth's population is noticeably smaller.",
+      "Somewhere, a spirit healer knows {name} by name: {n} kills and counting.",
+      "{name} has a body count of {n}. Not one of them is coming back.",
+      "{n} creatures, all by {name}'s hand. The local wildlife has heard the stories.",
     },
   },
   menace = {
@@ -853,6 +865,7 @@ function T.Build(db)
   end
 
   lifetime("menace", T.Stat("critters"), 250, {})
+  lifetime("bloodthirsty", T.Stat("creatures"), 100000, {})
   lifetime("hugger", T.Stat("hugs"), 50, {})
   lifetime("joker", T.Stat("lols"), 100, {})
   lifetime("exasperated", T.Stat("facepalms"), 50, {})

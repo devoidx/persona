@@ -23,7 +23,7 @@ The panel has six tabs: **Profile** (your title and traits), **Habits**, **Emote
 | Vanity pets | Summoned Pet Journal pet (`C_PetJournal.GetSummonedPetGUID`), by species, with your custom name if you gave one. Works on WoW: Forever too |
 | Combat pets | Hunter, warlock and other class pets (`UnitExists("pet")`, `UnitName`, `UnitCreatureFamily`), by name |
 | Kills (optional) | Read from the [KillDex](https://www.curseforge.com/wow/addons/killdex) addon's per-character data when it's installed: total kills, kinds of creature, rares, most-killed mob. Persona doesn't count kills itself |
-| Lifetime habits | Statistics panel (deaths, falling deaths, emotes, critters, abandoned quests) |
+| Lifetime habits | Statistics panel (deaths, falling deaths, emotes, creatures and critters killed, abandoned quests) |
 
 Everything is stored per character in `PersonaDB`. No combat data is read, so it is unaffected by Midnight's secret-value restrictions.
 

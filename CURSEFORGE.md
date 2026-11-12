@@ -46,7 +46,7 @@ Each trait has five phrasings that change daily, so your profile doesn't read th
 - How full you keep your bags
 - Your vanity pets and your combat pets, by name
 - Class and racial signature moves used for no good reason: portals, summons, Feign Death with nothing nearby, Shadowmeld in town, War Stomp at nobody
-- Your lifetime record from the Statistics panel: deaths, falling deaths, abandoned quests, critters, hugs, waves, LOLs and facepalms
+- Your lifetime record from the Statistics panel: deaths, falling deaths, abandoned quests, creatures and critters killed, hugs, waves, LOLs and facepalms
 
 ### Works with KillDex
 If you also use [KillDex](https://www.curseforge.com/wow/addons/killdex), Persona reads its kill counts and adds a Kills section to Habits, plus Grudge Match (one creature you just can't stop killing), Rare Hunter and Exterminator. Without KillDex, these simply don't appear.
@@ -60,7 +60,7 @@ If you also use [KillDex](https://www.curseforge.com/wow/addons/killdex), Person
 - **Roster**: every character on your account, who gets your time, and which one is "your dramatic one"
 
 ### About 50 traits
-Restless, Grounded, City Slicker, Homebody, Wanderer, Loyal, Stable Master, Pedestrian, Gravity Enthusiast, Leap of Faith, Gravity Victim, Commitment Issues, Menace to Wildlife, The Hugger, Easily Amused, Exasperated, Friendly, Cheerleader, Sardonic, Stone-Faced, Dancer, Dances Alone, Polite, Rude, Night Owl, Early Bird, Weekend Warrior, Hoarder, Travels Light, Nemesis, Easily Distracted, Taxi Service, Summoning Circle, Never Owned a Horse, Lurker, Drama Queen, Hiding From Nobody, Runs With the Pack, Rocket Commuter, Happy Camper, Born to Soar, Stomps for Fun, Escape Artist, Never Alone, Best Friends, Menagerie, Old Friend, Stable of Beasts, Lone Wolf, and with KillDex: Grudge Match, Rare Hunter and Exterminator.
+Restless, Grounded, City Slicker, Homebody, Wanderer, Loyal, Stable Master, Pedestrian, Gravity Enthusiast, Leap of Faith, Gravity Victim, Commitment Issues, Menace to Wildlife, Bloodthirsty, The Hugger, Easily Amused, Exasperated, Friendly, Cheerleader, Sardonic, Stone-Faced, Dancer, Dances Alone, Polite, Rude, Night Owl, Early Bird, Weekend Warrior, Hoarder, Travels Light, Nemesis, Easily Distracted, Taxi Service, Summoning Circle, Never Owned a Horse, Lurker, Drama Queen, Hiding From Nobody, Runs With the Pack, Rocket Commuter, Happy Camper, Born to Soar, Stomps for Fun, Escape Artist, Never Alone, Best Friends, Menagerie, Old Friend, Stable of Beasts, Lone Wolf, and with KillDex: Grudge Match, Rare Hunter and Exterminator.
 
 Your whole account gets traits too: Altoholic, One True Main and Split Personality.
 

@@ -48,7 +48,7 @@ UIParent = Frame.new(); UIParent.name = "UIParent"
 CharacterFrame = Frame.new(); CharacterFrame.name = "CharacterFrame"
 '''
 VETERAN_STATS = """
-  local stats = { [60] = "2,901", [114] = "69", [94] = "4,252", [98] = "17,339", [108] = "11,210",
+  local stats = { [60] = "2,901", [114] = "69", [94] = "4,252", [98] = "17,339", [107] = "310,170", [108] = "11,210",
     [1065] = "57", [1045] = "37", [1042] = "32", [1066] = "0", [1047] = "2", [1067] = "0" }
   function GetAchievementInfo(a, b) if b == nil and stats[a] then return a, "stat" end end
   function GetStatistic(id) return stats[id] end

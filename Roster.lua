@@ -29,7 +29,7 @@ local WORDS = {
   camper = "outdoorsy", soarer = "high-flying", stomper = "stompy", escapee = "slippery",
   neveralone = "sociable", menagerie = "pet-collecting",
   beaststable = "beast-collecting", lonewolf = "lone-wolf",
-  grudge = "grudge-holding", rarehunter = "rare-hunting", exterminator = "bloodthirsty",
+  grudge = "grudge-holding", rarehunter = "rare-hunting", exterminator = "exterminating", bloodthirsty = "bloodthirsty",
 }
 
 local function isSecret(v) return issecretvalue ~= nil and issecretvalue(v) end
