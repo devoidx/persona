@@ -1,5 +1,10 @@
 # Persona
 
+## v0.7.3
+- Vanity pets: Never Alone, Best Friends and Menagerie, plus a Vanity pets section on Habits.
+- Opened from the character screen, the panel now closes with it, even if moved.
+- Places: time in open ground between named places is labelled as such.
+
 ## v0.7.2
 - EllesmereUI users: Persona now matches your UI's look (window, buttons, fonts and accent colour).
   Turn it off in EllesmereUI under Blizzard Skins+ > Window Skins > Third-Party Addons.
