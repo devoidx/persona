@@ -200,6 +200,17 @@ function Tab.Habits(db, add)
     if stealth > 0 then add(("Stealthed outside combat: %s"):format(T.FmtTime(stealth))) end
   end
 
+  local combatTime = db.combatPetTime or 0
+  if combatTime > 0 then
+    add(" ")
+    add(heading() .. "Combat pets|r")
+    add(("Pet out: %d%% of the time"):format(pctOf(combatTime, db.tracked)))
+    for _, p in ipairs(T.TopN(db.combatPets or {}, 3)) do
+      local family = (db.combatPetFamily or {})[p.k]
+      add(("%s%s - %s"):format(p.k, family and (" (" .. family .. ")") or "", T.FmtTime(p.v)))
+    end
+  end
+
   local petTime = db.petTime or 0
   if petTime > 0 then
     add(" ")

@@ -28,6 +28,7 @@ local WORDS = {
   dramaqueen = "dramatic", hider = "shadowy", wildrunner = "wild", rocketeer = "rocket-powered",
   camper = "outdoorsy", soarer = "high-flying", stomper = "stompy", escapee = "slippery",
   neveralone = "sociable", menagerie = "pet-collecting",
+  beaststable = "beast-collecting", lonewolf = "lone-wolf",
 }
 
 local function isSecret(v) return issecretvalue ~= nil and issecretvalue(v) end

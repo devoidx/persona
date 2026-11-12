@@ -112,3 +112,20 @@ many = lua.eval("{" + ", ".join(f"[{i}] = 60" for i in range(1, 16)) + "}")
 got = build_with(petTime=900, pets=many)
 assert "menagerie" in got and "neveralone" not in got and "bestfriend" not in got, got
 print("ok: Never Alone, Best Friends and Menagerie fire at their thresholds")
+
+# Combat pet traits
+lua.execute('function UnitClass() return "Hunter", "HUNTER" end')
+fang = lua.eval('{ ["Fang"] = 3 * 3600, ["Biscuit"] = 600 }'); fam = lua.eval('{ ["Fang"] = "Wolf" }')
+got = build_with(petTime=0, pets=lua.table(), tracked=5 * 3600, combatPetTime=3 * 3600 + 600, combatPets=fang, combatPetFamily=fam)
+assert "oldfriend" in got and "lonewolf" not in got, got
+of = [t for t in ns.traits.Build(db).values() if t.id == "oldfriend"][0]
+assert "Fang" in of.text or "Fang" in of.epithet
+many = lua.eval("{" + ", ".join(f'["Pet{i}"] = 600' for i in range(8)) + "}")
+got = build_with(combatPetTime=8 * 600, combatPets=many)
+assert "beaststable" in got and "oldfriend" not in got, got
+got = build_with(combatPetTime=600, combatPets=lua.eval('{ ["Fang"] = 600 }'))
+assert "lonewolf" in got, got
+lua.execute('function UnitClass() return "Death Knight", "DEATHKNIGHT" end')
+got = build_with(combatPetTime=8 * 600, combatPets=many)
+assert "lonewolf" not in got and "beaststable" not in got, "Lone Wolf and Stable of Beasts are for hunters only"
+print("ok: Old Friend; Stable of Beasts and Lone Wolf for hunters only")

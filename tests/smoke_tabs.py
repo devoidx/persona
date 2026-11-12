@@ -75,7 +75,8 @@ VETERAN = """{ tracked = 6 * 3600, travel = 40 * 60, onFoot = 30 * 60, travelJum
   emotes = { DANCE = 6, BOW = 3, WAVE = 1 }, emoteTotal = 10, soloDances = 2, panelOpen = false,
   bagSamples = 100, bagFull = 87, deathsSeen = 4, deathZones = { ["Oribos"] = 3, ["Valdrakken"] = 1 },
   afkCount = 1, afkTime = 754, moves = { feign = 12, shadowmeld = 3 }, formTravel = 0, stealthTime = 600,
-  petTime = 3 * 3600, pets = { [42] = 2 * 3600, [7] = 3600 }, petNames = { [42] = "Mr Whiskers", [7] = "Bob" } }"""
+  petTime = 3 * 3600, pets = { [42] = 2 * 3600, [7] = 3600 }, petNames = { [42] = "Mr Whiskers", [7] = "Bob" },
+  combatPetTime = 2 * 3600, combatPets = { ["Fang"] = 2 * 3600 }, combatPetFamily = { ["Fang"] = "Wolf" } }"""
 
 FRESH = """{ tracked = 0, travel = 0, onFoot = 0, travelJumps = 0, totalJumps = 0, mounted = 0, mounts = {},
   zones = {}, idleResting = 0, idleZones = {}, falls = 0, fallYards = 0, longestFall = 0,
@@ -123,7 +124,7 @@ check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.
       "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
       "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos",
       "Bags: 87% full on average", "AFK: once, 12m in total",
-      "Vanity pets", "Vanity pet out: 50% of the time", "Mr Whiskers - 2h 0m", "Bob - 1h 0m",
+      "Combat pets", "Pet out: 33% of the time", "Fang (Wolf) - 2h 0m", "Vanity pets", "Vanity pet out: 50% of the time", "Mr Whiskers - 2h 0m", "Bob - 1h 0m",
       "Signature moves", "Feign Death, nothing near: 12", "Shadowmeld in town: 3", "Stealthed outside combat: 10m",
       absent=("In animal form",))
 check("Emotes", "10 emotes, 3 different", "/dance - 6 (60%)", "Danced alone: twice")
@@ -146,5 +147,5 @@ check("Profile", "Thrall", absent=("Menace", "Watching for"))
 for tab, want in (("Habits", "No riding recorded yet."), ("Habits", "Nothing recorded yet."),
                   ("Emotes", "No emotes yet."), ("Lifetime", "no Statistics panel"),
                   ("Places", "Nowhere recorded yet.")):
-    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves", "Vanity pets"))
+    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves", "Vanity pets", "Combat pets"))
 print("ok: brand-new character, every tab has an empty state")

@@ -31,6 +31,10 @@ function UnitIsAFK() return AFK end
 NUM_BAG_SLOTS = 4
 -- backpack 16 (2 free), bag 1: 20 (full), bag 2: profession bag 30 (all free), bag 3: empty slot
 local bags = { [0] = { 16, 2, 0 }, [1] = { 20, 0, 0 }, [2] = { 30, 30, 8 }, [3] = { 0, 0, 0 } }
+COMBATPET = nil
+function UnitExists(u) return u == "pet" and COMBATPET ~= nil end
+function UnitName(u) if u == "pet" then return COMBATPET end return "Thrall" end
+function UnitCreatureFamily(u) if u == "pet" and COMBATPET then return "Wolf" end end
 PET = "BattlePet-0-1"
 C_PetJournal = {
   GetSummonedPetGUID = function() return PET end,
@@ -92,3 +96,14 @@ lua.execute('C_PetJournal = nil')
 for i in range(40):
     lua.execute(f"NOW = {3000 + i}"); core_tick()
 print("ok: companion time and custom names; no pet or no pet journal: nothing recorded, no errors")
+
+# Combat pets: by name, with family; none out records nothing
+lua.execute('C_PetJournal = nil; COMBATPET = "Fang"')
+for i in range(20):
+    lua.execute(f"NOW = {4000 + i}"); core_tick()
+assert db.combatPets["Fang"] and abs(db.combatPets["Fang"] - db.combatPetTime) < 1e-9 and db.combatPetFamily["Fang"] == "Wolf"
+lua.execute('COMBATPET = nil'); before = db.combatPetTime
+for i in range(40):
+    lua.execute(f"NOW = {5000 + i}"); core_tick()
+assert db.combatPetTime == before
+print("ok: combat pet time by name and family; no pet out records nothing")

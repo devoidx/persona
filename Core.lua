@@ -47,6 +47,9 @@ local DEFAULTS = {
   pets = {},                 -- [speciesID] = seconds out as your companion
   petNames = {},             -- [speciesID] = custom name if given, else species name
   petTime = 0,               -- seconds with any companion out
+  combatPets = {},           -- [pet name] = seconds out (hunter, warlock and other combat pets)
+  combatPetFamily = {},      -- [pet name] = creature family, e.g. "Wolf"
+  combatPetTime = 0,         -- seconds with any combat pet out
   formTravel = 0,            -- seconds travelling in Travel Form / Ghost Wolf
   stealthTime = 0,           -- seconds stealthed out of combat
   emotes = {},               -- [TOKEN] = times performed, e.g. DANCE, BOW
@@ -101,6 +104,17 @@ local clockHour, clockDay, clockCheck = nil, nil, 0
 local bagCheck, afkSince = 0, nil
 local petAcc = 0
 local PET_EVERY = 5
+
+-- Which combat pet is out (hunter beast, warlock demon...), by name
+local function sampleCombatPet(seconds)
+  if not (UnitExists and UnitExists("pet")) then return end
+  local name = UnitName("pet")
+  if not name or isSecret(name) or name == "" then return end
+  db.combatPets[name] = (db.combatPets[name] or 0) + seconds
+  db.combatPetTime = db.combatPetTime + seconds
+  local family = UnitCreatureFamily and UnitCreatureFamily("pet")
+  if family and not isSecret(family) then db.combatPetFamily[name] = family end
+end
 
 -- Which companion pet is out, credited with the time since the last check
 local function samplePet(seconds)
@@ -217,6 +231,7 @@ local function onUpdate(_, elapsed)
   petAcc = petAcc + dt
   if petAcc >= PET_EVERY then
     samplePet(petAcc)
+    sampleCombatPet(petAcc)
     petAcc = 0
   end
 

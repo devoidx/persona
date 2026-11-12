@@ -648,6 +648,40 @@ local COPY = {
       "{n} companions have travelled with {name}. The stable is getting crowded.",
     },
   },
+  -- Combat pets (observed since install)
+  oldfriend = {
+    label = "Old Friend",
+    epithet = "{name} and {pet}",
+    lines = {
+      "{pet} has fought beside {name} for {t}. Some bonds don't break.",
+      "{name} and {pet}: {p}% of all {his} time with a pet out. Partners for life.",
+      "Other pets have come and gone. {pet} stays at {name}'s side.",
+      "{t} of {pet} at {name}'s side. Loyalty works both ways.",
+      "{name} trusts one pet above all others: {pet}, out {p}% of the time.",
+    },
+  },
+  beaststable = {
+    label = "Stable of Beasts",
+    epithet = "{name} the Beastmaster",
+    lines = {
+      "{name} has fought alongside {n} different pets. Every one has a story.",
+      "{n} pets and counting. {name} likes to mix things up.",
+      "{name}'s stable holds {n} veterans so far.",
+      "A pet for every occasion: {n} have fought with {name}.",
+      "{n} different pets have had {name}'s back.",
+    },
+  },
+  lonewolf = {
+    label = "Lone Wolf",
+    epithet = "{name} the Lone Wolf",
+    lines = {
+      "{name} prefers to hunt alone. A pet is out only {p}% of the time.",
+      "Pets are a distraction. {name} has one out just {p}% of the time.",
+      "{name} works alone. The stable master hasn't seen {his} pets in a while.",
+      "Only {p}% of the time with a pet out. {name} does the hunting personally.",
+      "{name} keeps the pets at home: out just {p}% of the time.",
+    },
+  },
   -- When they play
   nightowl = {
     label = "Night Owl",
@@ -873,6 +907,25 @@ function T.Build(db)
     local kinds = count(db.pets or {})
     if kinds >= 15 then add("menagerie", 1 + 0.25 * math.log(kinds / 15), { n = kinds }) end
 
+    -- Combat pets: one favourite, a big stable, or (hunters only) hardly any pet at all
+    local combatTime = db.combatPetTime or 0
+    if combatTime >= 2 * 3600 then
+      local pet, t = top(db.combatPets or {})
+      if pet and t / combatTime >= 0.7 then
+        add("oldfriend", (t / combatTime) / 0.7, { pet = pet, p = pct(t / combatTime), t = T.FmtTime(t) })
+      end
+    end
+    -- Hunter-only: other classes' pets (a Death Knight's ghoul, say) may get a new
+    -- name each summon, which would look like a big stable
+    local classFile = UnitClass and select(2, UnitClass("player"))
+    local stable = count(db.combatPets or {})
+    if classFile == "HUNTER" and stable >= 8 then
+      add("beaststable", 1 + 0.25 * math.log(stable / 8), { n = stable })
+    end
+    if classFile == "HUNTER" and db.tracked >= T.MIN_PATTERN and combatTime / db.tracked < 0.1 then
+      add("lonewolf", 1.2, { p = pct(combatTime / db.tracked) })
+    end
+
     -- Jumping while travelling
     local travelMin = db.travel / 60
     if travelMin >= 5 then
@@ -930,7 +983,7 @@ function T.Build(db)
 
   -- Traits that contradict each other as personality, even when the data
   -- supports both: keep only the stronger of each pair.
-  local OPPOSITES = { { "homebody", "wanderer" }, { "nightowl", "earlybird" } }
+  local OPPOSITES = { { "homebody", "wanderer" }, { "nightowl", "earlybird" }, { "oldfriend", "lonewolf" } }
   local byId = {}
   for i, t in ipairs(out) do byId[t.id] = i end
   local drop = {}
