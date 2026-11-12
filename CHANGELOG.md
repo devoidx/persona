@@ -1,5 +1,9 @@
 # Persona
 
+## v0.7.7
+- Race and class flavour: some traits now have extra lines just for your race or class, mixed in with the usual phrasings.
+- Bloodthirsty starts at 10,000 kills on WoW: Forever (100,000 on retail), since every Forever character is new.
+
 ## v0.7.6
 - Bloodthirsty: a lifetime trait for anyone with 100,000+ creatures killed, from the Statistics panel. Creatures killed now shows on the Lifetime tab.
 
