@@ -204,7 +204,7 @@ function Tab.Habits(db, add)
   if combatTime > 0 then
     add(" ")
     add(heading() .. "Combat pets|r")
-    add(("Pet out: %d%% of the time"):format(pctOf(combatTime, db.tracked)))
+    add(("Pet out: %d%% of the time"):format(pctOf(combatTime, T.Observed(db, "combatPetTime"))))
     for _, p in ipairs(T.TopN(db.combatPets or {}, 3)) do
       local family = (db.combatPetFamily or {})[p.k]
       add(("%s%s - %s"):format(p.k, family and (" (" .. family .. ")") or "", T.FmtTime(p.v)))
@@ -216,7 +216,7 @@ function Tab.Habits(db, add)
     add(" ")
     -- "Vanity pets", not "companions": on a hunter or warlock "companion" reads as the combat pet
     add(heading() .. "Vanity pets|r")
-    add(("Vanity pet out: %d%% of the time"):format(pctOf(petTime, db.tracked)))
+    add(("Vanity pet out: %d%% of the time"):format(pctOf(petTime, T.Observed(db, "petTime"))))
     for _, p in ipairs(T.TopN(db.pets or {}, 3)) do
       add(("%s - %s"):format((db.petNames or {})[p.k] or "Vanity pet", T.FmtTime(p.v)))
     end

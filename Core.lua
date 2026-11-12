@@ -73,10 +73,22 @@ local function safeSpeed()
   return s
 end
 
+-- Measurements added after Persona was first installed. When one of these
+-- fields is created, note how much had already been observed, so shares
+-- ("pet out 40% of the time") only count the time since it started recording.
+local MEASURED_SINCE = {
+  petTime = true, combatPetTime = true, afkTime = true, stealthTime = true, formTravel = true,
+}
+
 local function applyDefaults(db)
+  local tracked, travel = db.tracked or 0, db.travel or 0
   for k, v in pairs(DEFAULTS) do
     if db[k] == nil then
       db[k] = (type(v) == "table") and {} or v
+      if MEASURED_SINCE[k] then
+        db.since = db.since or {}
+        db.since[k] = { tracked = tracked, travel = travel }
+      end
     end
   end
 end
@@ -340,6 +352,23 @@ function ns.migrate(d)
       d.emoteTotal = math.max(0, (d.emoteTotal or 0) - bogus)
     end
     v = 2
+  end
+  if v < 3 then
+    -- Before 0.7.4, shares like "pet out 40% of the time" divided by all time
+    -- observed since install, though these measurements started later, so they
+    -- read far too low (and a veteran hunter looked petless). With no record of
+    -- when each one started, restart it now so its shares are right from here on.
+    local RESETS = { petTime = { "pets" }, combatPetTime = { "combatPets" }, afkTime = { "afkCount" },
+                     stealthTime = {}, formTravel = {} }
+    d.since = d.since or {}
+    for key, related in pairs(RESETS) do
+      if not d.since[key] then
+        d[key] = 0
+        for _, r in ipairs(related) do d[r] = (type(d[r]) == "table") and {} or 0 end
+        d.since[key] = { tracked = d.tracked or 0, travel = d.travel or 0 }
+      end
+    end
+    v = 3
   end
   d.version = v
 end

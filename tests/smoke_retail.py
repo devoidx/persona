@@ -129,3 +129,16 @@ lua.execute('function UnitClass() return "Death Knight", "DEATHKNIGHT" end')
 got = build_with(combatPetTime=8 * 600, combatPets=many)
 assert "lonewolf" not in got and "beaststable" not in got, "Lone Wolf and Stable of Beasts are for hunters only"
 print("ok: Old Friend; Stable of Beasts and Lone Wolf for hunters only")
+
+# The 0.7.4 bug: a veteran hunter installs pet tracking. 20h observed overall,
+# but pet time only counted for the last 10 minutes (pet out for 9 of them).
+lua.execute('function UnitClass() return "Hunter", "HUNTER" end')
+since = lua.eval("{ combatPetTime = { tracked = 20 * 3600 - 600, travel = 0 } }")
+got = build_with(tracked=20 * 3600, combatPetTime=540, combatPets=lua.eval('{ ["Fang"] = 540 }'), since=since)
+assert "lonewolf" not in got, "only 10 minutes of pet tracking: too early to call anyone a Lone Wolf"
+assert abs(ns.traits.Observed(db, "combatPetTime") - 600) < 1e-9
+# Three hours later with the pet out 5% of them: now Lone Wolf is earned
+got = build_with(tracked=20 * 3600 - 600 + 3 * 3600, combatPetTime=540)
+assert "lonewolf" in got, got
+build_with(since=lua.table())
+print("ok: shares count only time since each measurement started (no false Lone Wolf)")

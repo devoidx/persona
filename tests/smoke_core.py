@@ -52,9 +52,25 @@ print("ok: emote hooks, duplicate filter, solo dances, automatic READ ignored")
 # Upgrade from 0.5.0: Tony's real numbers, 15 emotes of which 10 bogus READ
 old = lua.eval('{ version = 1, emotes = { READ = 10, DANCE = 3, BOW = 2 }, emoteTotal = 15 }')
 ns.migrate(old)
-assert old.emotes["READ"] is None and old.emoteTotal == 5 and old.version == 2, (old.emoteTotal, old.version)
+assert old.emotes["READ"] is None and old.emoteTotal == 5 and old.version == 3, (old.emoteTotal, old.version)
 ns.migrate(old)   # runs again on every load: must be a no-op now
 assert old.emoteTotal == 5
 fresh = lua.eval('{ emotes = {}, emoteTotal = 0 }'); ns.migrate(fresh)
-assert fresh.version == 2 and fresh.emoteTotal == 0
+assert fresh.version == 3 and fresh.emoteTotal == 0
 print("ok: 0.5.0 data upgraded once (15 -> 5), fresh installs untouched")
+
+# Upgrade to 3: measurements without a start point restart from now; fresh installs untouched
+old = lua.eval("""{ version = 2, tracked = 72000, travel = 9000, petTime = 600, pets = { [42] = 600 },
+  combatPetTime = 60, combatPets = { Fang = 60 }, afkTime = 300, afkCount = 4, stealthTime = 50, formTravel = 20 }""")
+ns.migrate(old)
+assert old.version == 3 and old.petTime == 0 and old.combatPetTime == 0 and old.afkTime == 0 and old.afkCount == 0
+assert next(iter(old.pets.keys()), None) is None and next(iter(old.combatPets.keys()), None) is None
+assert old.since["combatPetTime"].tracked == 72000 and old.since["formTravel"].travel == 9000
+old.combatPetTime = 30; ns.migrate(old)
+assert old.combatPetTime == 30, "runs once"
+new = lua.eval("""{ version = 2, tracked = 500, petTime = 120, since = { petTime = { tracked = 400, travel = 0 },
+  combatPetTime = { tracked = 400, travel = 0 }, afkTime = { tracked = 400, travel = 0 },
+  stealthTime = { tracked = 400, travel = 0 }, formTravel = { tracked = 400, travel = 0 } } }""")
+ns.migrate(new)
+assert new.petTime == 120 and new.since["petTime"].tracked == 400, "measurements with a start point are kept"
+print("ok: upgrade to 3 restarts unanchored measurements once, keeps anchored ones")

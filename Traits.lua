@@ -54,6 +54,19 @@ end
 
 local function pct(x) return math.floor(x * 100 + 0.5) end
 
+-- Time observed since a measurement started recording (see MEASURED_SINCE in
+-- Core.lua). Without this, a feature added months after install would compare
+-- an hour of data against months of observed time.
+function T.Observed(db, key)
+  local s = (db.since or {})[key]
+  return math.max(0, (db.tracked or 0) - (s and s.tracked or 0))
+end
+
+function T.ObservedTravel(db, key)
+  local s = (db.since or {})[key]
+  return math.max(0, (db.travel or 0) - (s and s.travel or 0))
+end
+
 -- "Silvermoon City - The Bazaar" -> "The Bazaar"
 local function placeName(key)
   if not key then return nil end
@@ -871,8 +884,9 @@ function T.Build(db)
     end
 
     -- AFK: 3h observed, 5+ breaks, 10%+ of the time away
-    if db.tracked >= T.MIN_PATTERN and (db.afkCount or 0) >= 5 then
-      local share = (db.afkTime or 0) / db.tracked
+    local afkSeen = T.Observed(db, "afkTime")
+    if afkSeen >= T.MIN_PATTERN and (db.afkCount or 0) >= 5 then
+      local share = (db.afkTime or 0) / afkSeen
       if share >= 0.1 then
         add("wandersoff", share / 0.1, { n = db.afkCount, p = pct(share), t = T.FmtTime(db.afkTime) })
       end
@@ -880,21 +894,26 @@ function T.Build(db)
 
     -- Animal-form travel: half the ground travel, and at least half an hour of it
     local formTravel = db.formTravel or 0
-    if formTravel >= 1800 and db.travel > 0 and formTravel / db.travel >= 0.5 then
-      local share = formTravel / db.travel
+    local travelSeen = T.ObservedTravel(db, "formTravel")
+    if formTravel >= 1800 and travelSeen > 0 and formTravel / travelSeen >= 0.5 then
+      local share = formTravel / travelSeen
       add("nohorse", share / 0.5, { p = pct(share) })
     end
 
     -- Stealth outside combat: 10% of the time, at least half an hour
     local stealth = db.stealthTime or 0
-    if stealth >= 1800 and stealth / db.tracked >= 0.1 then
-      add("lurker", (stealth / db.tracked) / 0.1, { p = pct(stealth / db.tracked), t = T.FmtTime(stealth) })
+    local stealthSeen = T.Observed(db, "stealthTime")
+    if stealth >= 1800 and stealthSeen > 0 and stealth / stealthSeen >= 0.1 then
+      local share = stealth / stealthSeen
+      add("lurker", share / 0.1, { p = pct(share), t = T.FmtTime(stealth) })
     end
 
     -- Companion pets: share of time with one out, a favourite, or sheer variety
     local petTime = db.petTime or 0
-    if petTime / db.tracked >= 0.5 then
-      add("neveralone", (petTime / db.tracked) / 0.5, { p = pct(petTime / db.tracked) })
+    local petSeen = T.Observed(db, "petTime")
+    if petSeen >= T.MIN_PATTERN and petTime / petSeen >= 0.5 then
+      local share = petTime / petSeen
+      add("neveralone", share / 0.5, { p = pct(share) })
     end
     if petTime >= 3600 then
       local species, t = top(db.pets or {})
@@ -922,8 +941,9 @@ function T.Build(db)
     if classFile == "HUNTER" and stable >= 8 then
       add("beaststable", 1 + 0.25 * math.log(stable / 8), { n = stable })
     end
-    if classFile == "HUNTER" and db.tracked >= T.MIN_PATTERN and combatTime / db.tracked < 0.1 then
-      add("lonewolf", 1.2, { p = pct(combatTime / db.tracked) })
+    local combatSeen = T.Observed(db, "combatPetTime")
+    if classFile == "HUNTER" and combatSeen >= T.MIN_PATTERN and combatTime / combatSeen < 0.1 then
+      add("lonewolf", 1.2, { p = pct(combatTime / combatSeen) })
     end
 
     -- Jumping while travelling
