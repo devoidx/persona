@@ -4,7 +4,7 @@ A World of Warcraft addon that watches how your character behaves and writes a p
 
 Open it with `/persona` or the **Persona** button under the character frame.
 
-The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emotes**, **Lifetime** (from the Statistics panel), **Places** and **Roster** (every character on your account). It remembers the last tab you used.
+The panel has six tabs: **Profile** (your title and traits), **Habits**, **Emotes**, **Lifetime** (from the Statistics panel), **Places** and **Roster** (every character on your account). It remembers the last tab you used.
 
 ## What it tracks
 
@@ -20,7 +20,8 @@ The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emot
 | Where you die | `PLAYER_DEAD` plus current place |
 | AFK breaks | `PLAYER_FLAGS_CHANGED` plus `UnitIsAFK` |
 | Signature moves | Out-of-combat casts of a fixed list of class and racial spells (`UNIT_SPELLCAST_SUCCEEDED`), plus animal-form travel and stealth time |
-| Vanity pets | Summoned Pet Journal pet (not hunter or warlock combat pets) every 5 seconds (`C_PetJournal.GetSummonedPetGUID`), by species, with your custom name if you gave one |
+| Vanity pets | Summoned Pet Journal pet (`C_PetJournal.GetSummonedPetGUID`), by species, with your custom name if you gave one. Works on WoW: Forever too |
+| Combat pets | Hunter, warlock and other class pets (`UnitExists("pet")`, `UnitName`, `UnitCreatureFamily`), by name |
 | Lifetime habits | Statistics panel (deaths, falling deaths, emotes, critters, abandoned quests) |
 
 Everything is stored per character in `PersonaDB`. No combat data is read, so it is unaffected by Midnight's secret-value restrictions.
@@ -37,10 +38,10 @@ With EllesmereUI installed, Persona's window, buttons and fonts take on Ellesmer
 - `/persona share` (or `/persona share chat`): open a copy box with your profile as text for Discord or in-game chat; also the **Share** button next to the panel title
 - `/persona dock`: put the panel back beside the character frame after moving it
 - `/persona minimap`: hide or show the minimap button (Persona is also in the minimap's addons button)
-- `/persona forget Name`: remove a character from the roster (use `Name-Realm` if two share a name)
-
-Drag the panel to move it. Once moved it opens where you left it, and stays open when the character frame closes.
+- `/persona forget Name`: remove a character from the roster (use `Name-Realm` if two share a name, or `First Surname` on WoW: Forever)
 - `/persona reset`: wipe this character's data
+
+Drag the panel to move it. Once moved it opens where you left it. Opened from the character frame, it closes when the character frame does.
 
 ## Bundled libraries
 
