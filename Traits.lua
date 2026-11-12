@@ -971,7 +971,8 @@ function T.Build(db)
       add("homebody", share / 0.2, { p = pct(share), place = placeName(spot) })
     end
     local places = count(db.zones)
-    if places >= 60 then add("wanderer", places / 60, { n = places }) end
+    -- Places, mounts and yards only ever grow: damp them so they can't hold the title forever
+    if places >= 60 then add("wanderer", damp(places / 60), { n = places }) end
 
     -- Mounts
     if db.mounted >= 10 * 60 then
@@ -983,7 +984,7 @@ function T.Build(db)
       end
       local ridden = count(db.mounts)
       local need = ns.IS_FOREVER and 4 or 12
-      if ridden >= need then add("collector", ridden / need, { n = ridden }) end
+      if ridden >= need then add("collector", damp(ridden / need), { n = ridden }) end
 
       -- Walking only counts as a choice once the character actually rides
       if db.travel >= 10 * 60 and db.onFoot / db.travel >= 0.6 then
@@ -994,7 +995,7 @@ function T.Build(db)
 
     -- Falling
     if db.fallYards >= 2000 then
-      add("gravityfan", db.fallYards / 2000, { n = BreakUpLargeNumbers(math.floor(db.fallYards)) })
+      add("gravityfan", damp(db.fallYards / 2000), { n = BreakUpLargeNumbers(math.floor(db.fallYards)) })
     end
     if db.longestFall >= 6 then
       add("leap", db.longestFall / 6, { n = ("%.1f"):format(db.longestFall) })

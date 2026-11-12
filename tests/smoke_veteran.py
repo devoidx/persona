@@ -32,3 +32,20 @@ print("ok: no place/time traits from one session")
 assert "Stone-Faced" in labels, "Stone-Faced should fire: 4,012h played, 0 LOLs"
 # (smoke_forever.py covers the other case: statistic not found, trait stays off)
 print("ok: Stone-Faced fires on zero LOLs")
+
+# Ever-growing totals must not lock the title: months of play with huge fall,
+# place and mount counts, and a moderately Restless character (16 jumps/min)
+mounts = "{" + ",".join(f"[{i}]=600" for i in range(1, 61)) + "}"
+zones = "{" + ",".join(f'["Zone {i}"]=600' for i in range(300)) + "}"
+db = lua.eval(f'''{{ tracked=300*3600, travel=100*3600, onFoot=10*3600, travelJumps=16*100*60, totalJumps=16*100*60,
+  mounted=60*600, mounts={mounts}, zones={zones},
+  idleResting=0, idleZones={{}}, fallYards=40000, longestFall=4, hours={{[14]=300*3600}}, days={{[1]=150*3600,[3]=150*3600}} }}''')
+t = ns.traits.Build(db)
+labels = [t[i].label for i in range(1, len(t)+1)]
+scores = {t[i].label: round(t[i].score, 2) for i in range(1, len(t)+1)}
+print("SCORES:", scores)
+for grower in ("Gravity Enthusiast", "Wanderer", "Stable Master"):
+    assert grower in labels, f"{grower} should still appear"
+    assert scores[grower] < 2, f"{grower} not damped: {scores[grower]}"
+assert labels[0] == "Restless", f"a 2x Restless habit should outrank piled-up totals, got {labels[0]}"
+print("ok: piled-up totals stay in the profile but don't take the title")
