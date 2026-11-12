@@ -1,5 +1,8 @@
 # Persona
 
+## v0.7.6
+- Bloodthirsty: a lifetime trait for anyone with 100,000+ creatures killed, from the Statistics panel. Creatures killed now shows on the Lifetime tab.
+
 ## v0.7.5
 - Works with KillDex: if it's installed, Habits gets a Kills section and three new traits: Grudge Match, Rare Hunter and Exterminator.
 - Vanity pets are tracked on WoW: Forever too.
