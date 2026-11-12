@@ -35,5 +35,27 @@ for tid, (epithet, lines) in traits.items():
         for unit in ("minute", "hours", "yards", "seconds"):
             if len(re.findall(r"\b" + unit + r"\b", text)) > 1:
                 problems.append(f"{tid}: '{unit}' repeated: {text}")
+# Race and class flavour lines: same placeholder rules as the trait they belong to
+fl = re.search(r"\nlocal FLAVOUR = \{\n(.*?)\n\}\n", src, re.S)
+flavour = 0
+if fl:
+    for m in re.finditer(r'^  (\w+) = \{\n(.*?)\n  \},', fl.group(1), re.S | re.M):
+        tid = m.group(1)
+        if tid not in traits:
+            problems.append(f"flavour for unknown trait {tid}")
+            continue
+        keys = supplied.get(tid, set()) | {"name", "his"}
+        seen = set()
+        for who, text in re.findall(r'^    (\w+) = "(.*)",$', m.group(2), re.M):
+            flavour += 1
+            if who in seen:
+                problems.append(f"{tid}: two flavour lines for {who}")
+            seen.add(who)
+            for ph in re.findall(r"\{(\w+)\}", text):
+                if ph not in keys:
+                    problems.append(f"{tid} ({who}): {{{ph}}} not supplied in: {text}")
+            for unit in ("minute", "hours", "yards", "seconds"):
+                if len(re.findall(r"\b" + unit + r"\b", text)) > 1:
+                    problems.append(f"{tid} ({who}): '{unit}' repeated: {text}")
 assert not problems, "\n".join(problems)
-print(f"ok: {len(traits)} traits, {sum(len(l) for _, l in traits.values())} phrasings, every placeholder supplied")
+print(f"ok: {len(traits)} traits, {sum(len(l) for _, l in traits.values())} phrasings, {flavour} race/class lines, every placeholder supplied")

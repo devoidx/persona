@@ -34,7 +34,7 @@ Persona quietly watches how your character actually behaves and turns it into a 
 >
 > **Menace to Wildlife.** Thrall has killed 2,511 critters. None of them were a threat.
 
-Each trait has five phrasings that change daily, so your profile doesn't read the same every time you open it.
+Each trait has five phrasings that change daily, so your profile doesn't read the same every time you open it. Some have extra lines just for your race or class: a druid's critter count may draw a remark from the Cenarion Circle.
 
 ### What it notices
 - How often you jump while travelling, and how far you fall

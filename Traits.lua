@@ -800,6 +800,102 @@ local COPY = {
   },
 }
 
+-- Race and class flavour: one extra phrasing per trait for characters of that
+-- race or class, mixed in with the usual five so it turns up now and then.
+-- Keys are the game's own tokens: race from UnitRace's second value (Undead is
+-- "Scourge"), class from UnitClass's second value. Lore, not stereotype jokes.
+-- Each line may only use the placeholders its trait's own lines use.
+local FLAVOUR = {
+  restless = {
+    MONK = "{name} rolls, jumps, then rolls again: {n} jumps a minute on the road. Stillness is a lesson for another day.",
+    Worgen = "{n} jumps a minute. Even on two legs, {name} moves like something from the Gilnean woods.",
+    Vulpera = "{name} bounces along like a caravan on a bumpy road: {n} jumps a minute.",
+  },
+  nightowl = {
+    NightElf = "{p}% of {name}'s adventures happen under Elune's light, between midnight and 5am.",
+    Scourge = "{name} gave up sleeping along with breathing. {p}% of {his} play happens between midnight and 5am.",
+    Nightborne = "{p}% of {name}'s play falls between midnight and 5am. Suramar never slept either.",
+  },
+  earlybird = {
+    Tauren = "{p}% of {name}'s play happens in the morning. The Earth Mother rewards an early start.",
+    PALADIN = "{name} rises with the Light: {p}% of all play happens before noon.",
+  },
+  homebody = {
+    Human = "{name} spends {p}% of {his} time in {place}. Humans have always built their lives behind strong walls.",
+    Gnome = "{p}% of {name}'s time is spent in {place}. After Gnomeregan, a home that stays put is worth a lot.",
+    BloodElf = "{p}% of {name}'s time is spent in {place}. A people who rebuilt Silvermoon from ashes know the value of home.",
+    Draenei = "{name} spends {p}% of {his} time in {place}. After millennia fleeing across the stars, staying put feels earned.",
+  },
+  wanderer = {
+    Pandaren = "{name} has been to {n} different places. The Wandering Isle never stayed still either.",
+    Vulpera = "{name} has seen {n} places. For a vulpera, home is wherever the caravan stops.",
+    Draenei = "Crossing the stars was harder: {name} has visited {n} places so far.",
+    KulTiran = "{name} has visited {n} places. Kul Tirans were never meant to stay in port.",
+  },
+  loyal = {
+    Orc = "The Frostwolves would approve: {name} rides {mount} {p}% of the time.",
+    Troll = "{name} rides {mount} {p}% of the time. The Darkspear know the worth of a loyal mount.",
+    PALADIN = "{name} rides {mount} {p}% of the time. A paladin keeps faith with a good steed.",
+    HUNTER = "{mount} carries {name} {p}% of the time. Hunters know a trusted animal when they see one.",
+  },
+  pedestrian = {
+    Tauren = "{name} walks {p}% of the way. The plains of Mulgore were made for walking.",
+    HighmountainTauren = "{name} goes on foot {p}% of the time. Highmountain was climbed on foot, after all.",
+  },
+  cityslicker = {
+    BloodElf = "{name} spends {p}% of {his} town time standing around in {place}. Someone has to admire the architecture.",
+    Goblin = "{name} lingers in {place} {p}% of the time. Somewhere nearby, a deal is about to happen.",
+  },
+  menace = {
+    DRUID = "{name} has killed {n} critters. The Cenarion Circle would like a word.",
+    HUNTER = "{name} has killed {n} critters. That isn't hunting, it's just untidy.",
+    Tauren = "{n} critters lost to {name}. The Earth Mother is keeping count.",
+  },
+  gravityvictim = {
+    MAGE = "{p}% of {name}'s deaths came from falling. Slow Fall is right there in the spellbook.",
+    PRIEST = "{p}% of {name}'s deaths are falls. Levitate exists for a reason.",
+    DEMONHUNTER = "{p}% of {name}'s deaths are from falling. The glide only works if you remember it.",
+    Dracthyr = "{p}% of {name}'s deaths came from falling. Wings help, but only when they're open.",
+  },
+  gravityfan = {
+    DEMONHUNTER = "{name} has fallen about {n} yards in total, wings out for most of it, presumably.",
+    Goblin = "{name} has fallen about {n} yards. Goblin engineering is mostly launch and very little landing.",
+  },
+  leap = {
+    Dracthyr = "{name}'s longest fall lasted {n} seconds. For a dracthyr, that's just flying downwards.",
+    DEMONHUNTER = "{n} seconds in free fall. {name} calls it a dramatic entrance.",
+  },
+  hoarder = {
+    Vulpera = "{name}'s bags are {p}% full. A vulpera never knows what the caravan might need.",
+    Dwarf = "{name}'s bags sit at {p}% full. The Explorers' League never throws away a possible relic.",
+    Goblin = "{name}'s bags are {p}% full. Everything has resale value, eventually.",
+  },
+  lurker = {
+    ROGUE = "{name} spends {p}% of {his} time outside combat in stealth. Old habits.",
+    NightElf = "{name} has spent {t} unseen outside a fight. Shadowmeld is a way of life.",
+    DRUID = "{name} prowls {p}% of the time, even with nothing to hunt.",
+  },
+  nohorse = {
+    DRUID = "{name} covers {p}% of {his} ground in Travel Form. Why borrow a horse when you can be the stag?",
+    SHAMAN = "{name} travels as a Ghost Wolf {p}% of the time. The spirits are faster than any stable.",
+  },
+  oldfriend = {
+    HUNTER = "{pet} has been at {name}'s side for {t}. A hunter's bond, the old-fashioned way.",
+    WARLOCK = "{name} keeps summoning {pet}: {p}% of all pet time. Even demons appreciate loyalty.",
+    DEATHKNIGHT = "{pet} has served {name} for {t}. Undying loyalty, quite literally.",
+  },
+  bloodthirsty = {
+    DEATHKNIGHT = "{name} has killed {n} creatures. Old habits from Icecrown die hard.",
+    WARRIOR = "{n} creatures have fallen to {name}. Every battle is the one that matters.",
+    DEMONHUNTER = "{name} has slain {n} creatures. Illidari training is thorough.",
+    Orc = "{n} creatures have fallen to {name}. Lok'tar ogar.",
+  },
+  stoneface = {
+    EarthenDwarf = "{n} hours played and {name} hasn't laughed once. Earthen are carved from stone, after all.",
+    Mechagnome = "{name} has played {n} hours without a single /lol. Humour module not installed.",
+  },
+}
+
 -- Emote groups for the Polite and Rude traits (tokens as the game names them)
 local POLITE = { "BOW", "THANK", "SALUTE", "CURTSEY", "KNEEL", "WELCOME", "GREET", "APPLAUD" }
 local RUDE = { "RUDE", "SPIT", "CHICKEN", "TAUNT", "GLOAT", "MOCK", "INSULT", "FART" }
@@ -821,16 +917,26 @@ end
 ---------------------------------------------------------------------------
 function T.Build(db)
   local name, his = who()
+  local race = UnitRace and select(2, UnitRace("player"))
+  local class = UnitClass and select(2, UnitClass("player"))
   local out = {}
 
   -- score = how far past its threshold the trait is; decides ordering and title
   local function add(id, score, vars, isLifetime)
     local c = COPY[id]
     vars.name, vars.his = name, his
+    -- The usual five phrasings, plus this race's and class's own line if it has one
+    local lines, extra = c.lines, FLAVOUR[id]
+    if extra and (extra[race] or extra[class]) then
+      lines = {}
+      for i, l in ipairs(c.lines) do lines[i] = l end
+      if extra[race] then lines[#lines + 1] = extra[race] end
+      if extra[class] then lines[#lines + 1] = extra[class] end
+    end
     out[#out + 1] = {
       id = id,
       label = c.label,
-      text = fill(pick(id, c.lines), vars),
+      text = fill(pick(id, lines), vars),
       epithet = fill(c.epithet, vars),
       score = score,
       lifetime = isLifetime or false,
@@ -865,7 +971,8 @@ function T.Build(db)
   end
 
   lifetime("menace", T.Stat("critters"), 250, {})
-  lifetime("bloodthirsty", T.Stat("creatures"), 100000, {})
+  -- Forever characters all started in November 2026, so they get a lower bar
+  lifetime("bloodthirsty", T.Stat("creatures"), ns.IS_FOREVER and 10000 or 100000, {})
   lifetime("hugger", T.Stat("hugs"), 50, {})
   lifetime("joker", T.Stat("lols"), 100, {})
   lifetime("exasperated", T.Stat("facepalms"), 50, {})
