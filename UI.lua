@@ -203,10 +203,11 @@ function Tab.Habits(db, add)
   local petTime = db.petTime or 0
   if petTime > 0 then
     add(" ")
-    add(heading() .. "Companions|r")
-    add(("Companion out: %d%% of the time"):format(pctOf(petTime, db.tracked)))
+    -- "Vanity pets", not "companions": on a hunter or warlock "companion" reads as the combat pet
+    add(heading() .. "Vanity pets|r")
+    add(("Vanity pet out: %d%% of the time"):format(pctOf(petTime, db.tracked)))
     for _, p in ipairs(T.TopN(db.pets or {}, 3)) do
-      add(("%s - %s"):format((db.petNames or {})[p.k] or "Companion", T.FmtTime(p.v)))
+      add(("%s - %s"):format((db.petNames or {})[p.k] or "Vanity pet", T.FmtTime(p.v)))
     end
   end
 

@@ -123,7 +123,7 @@ check("Habits", "Jumps: 900 (400 while travelling)", "Jump rate on the move: 10.
       "Distance fallen: about 331 yd", "Night (00-05): 50%", "Evening (17-24): 50%", "Weekends: 67%",
       "Wolf - 50m (83%)", "Idle in towns: 30m", "Mostly in Oribos",
       "Bags: 87% full on average", "AFK: once, 12m in total",
-      "Companions", "Companion out: 50% of the time", "Mr Whiskers - 2h 0m", "Bob - 1h 0m",
+      "Vanity pets", "Vanity pet out: 50% of the time", "Mr Whiskers - 2h 0m", "Bob - 1h 0m",
       "Signature moves", "Feign Death, nothing near: 12", "Shadowmeld in town: 3", "Stealthed outside combat: 10m",
       absent=("In animal form",))
 check("Emotes", "10 emotes, 3 different", "/dance - 6 (60%)", "Danced alone: twice")
@@ -146,5 +146,5 @@ check("Profile", "Thrall", absent=("Menace", "Watching for"))
 for tab, want in (("Habits", "No riding recorded yet."), ("Habits", "Nothing recorded yet."),
                   ("Emotes", "No emotes yet."), ("Lifetime", "no Statistics panel"),
                   ("Places", "Nowhere recorded yet.")):
-    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves", "Companions"))
+    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves", "Vanity pets"))
 print("ok: brand-new character, every tab has an empty state")
