@@ -1,5 +1,9 @@
 # Persona
 
+## v0.7.4
+- Combat pets: Old Friend for any class with a pet, plus Stable of Beasts and Lone Wolf for hunters. The Habits tab shows your combat pets and how long each one is out.
+- Fixed: time shares like "pet out" counted from before tracking started, and jumped around for the first few minutes. AFK, stealth, animal-form and pet history restart once.
+
 ## v0.7.3
 - Vanity pets: Never Alone, Best Friends and Menagerie, plus a Vanity pets section on Habits.
 - Opened from the character screen, the panel now closes with it, even if moved.
