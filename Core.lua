@@ -114,8 +114,6 @@ local currentMount, lastMountScan = nil, 0
 local fallStart = nil
 local clockHour, clockDay, clockCheck = nil, nil, 0
 local bagCheck, afkSince = 0, nil
-local petAcc = 0
-local PET_EVERY = 5
 
 -- Which combat pet is out (hunter beast, warlock demon...), by name
 local function sampleCombatPet(seconds)
@@ -128,7 +126,7 @@ local function sampleCombatPet(seconds)
   if family and not isSecret(family) then db.combatPetFamily[name] = family end
 end
 
--- Which companion pet is out, credited with the time since the last check
+-- Which vanity pet is out
 local function samplePet(seconds)
   if not (C_PetJournal and C_PetJournal.GetSummonedPetGUID) then return end
   local guid = C_PetJournal.GetSummonedPetGUID()
@@ -240,12 +238,10 @@ local function onUpdate(_, elapsed)
     sampleBags()
   end
 
-  petAcc = petAcc + dt
-  if petAcc >= PET_EVERY then
-    samplePet(petAcc)
-    sampleCombatPet(petAcc)
-    petAcc = 0
-  end
+  -- Pets every tick, like time observed, so the share doesn't jump about
+  -- while one counter moves in big steps and the other in small ones
+  samplePet(dt)
+  sampleCombatPet(dt)
 
   -- Local clock: refresh at most once a minute
   if now - clockCheck >= 60 or not clockHour then

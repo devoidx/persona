@@ -81,11 +81,11 @@ lua.execute("NOW = 660");              ev("PLAYER_LOGOUT", None)
 assert db.afkCount == 2 and db.afkTime == 360, (db.afkCount, db.afkTime)
 print("ok: AFK periods, other units ignored, logout while AFK")
 
-# Companion pets: credited every 5 seconds with the time since the last check
-pets_before = db.petTime
+# Vanity pets: credited every tick, exactly in step with time observed
+pets_before, tracked_before = db.petTime, db.tracked
 for i in range(20):                       # 20 ticks of 0.3s = 6s
     lua.execute(f"NOW = {1000 + i}"); core_tick = lua.eval('function() CORE.scripts.OnUpdate(CORE, 0.3) end'); core_tick()
-assert abs(db.petTime - pets_before - 5.1) < 1e-6 or abs(db.petTime - pets_before - 5.4) < 1e-6, db.petTime
+assert abs((db.petTime - pets_before) - (db.tracked - tracked_before)) < 1e-9, (db.petTime, db.tracked)
 assert db.pets[42] == db.petTime and db.petNames[42] == "Mr Whiskers", "custom name preferred"
 lua.execute('PET = nil')
 before = db.petTime
@@ -99,9 +99,11 @@ print("ok: companion time and custom names; no pet or no pet journal: nothing re
 
 # Combat pets: by name, with family; none out records nothing
 lua.execute('C_PetJournal = nil; COMBATPET = "Fang"')
+tracked_before = db.tracked
 for i in range(20):
     lua.execute(f"NOW = {4000 + i}"); core_tick()
 assert db.combatPets["Fang"] and abs(db.combatPets["Fang"] - db.combatPetTime) < 1e-9 and db.combatPetFamily["Fang"] == "Wolf"
+assert abs(db.combatPetTime - (db.tracked - tracked_before)) < 1e-9, "pet out the whole time: share is exactly 100%"
 lua.execute('COMBATPET = nil'); before = db.combatPetTime
 for i in range(40):
     lua.execute(f"NOW = {5000 + i}"); core_tick()
