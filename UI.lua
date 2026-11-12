@@ -283,6 +283,19 @@ function Tab.Lifetime(_, add)
   stat("World's smallest violin", "violins")
 end
 
+-- A zone's own name is recorded when you're in no named subzone: open ground,
+-- and most flying. Where the same zone also has named subzones in the list,
+-- say so, or "Bastion" alone looks like a mistake. Zones with no subzones
+-- (small islands and the like) keep their plain name.
+local function placeLabel(key, zones)
+  if key:find(" %- ") then return key end
+  local prefix = key .. " - "
+  for other in pairs(zones) do
+    if other:sub(1, #prefix) == prefix then return key .. " (between places)" end
+  end
+  return key
+end
+
 function Tab.Places(db, add)
   local places = T.TopN(db.zones, 1000)
   if #places == 0 then
@@ -295,13 +308,13 @@ function Tab.Places(db, add)
   -- Share first, so a long place name can wrap without splitting the number
   for i = 1, math.min(10, #places) do
     local z = places[i]
-    add(("%d%%  %s"):format(pctOf(z.v, db.tracked), z.k))
+    add(("%d%%  %s"):format(pctOf(z.v, db.tracked), placeLabel(z.k, db.zones)))
   end
   if (db.deathsSeen or 0) > 0 then
     add(" ")
     add(heading() .. "Where you die|r")
     for _, z in ipairs(T.TopN(db.deathZones or {}, 3)) do
-      add(("%d%%  %s"):format(pctOf(z.v, db.deathsSeen), z.k))
+      add(("%d%%  %s"):format(pctOf(z.v, db.deathsSeen), placeLabel(z.k, db.zones)))
     end
   end
   local towns = T.TopN(db.idleZones, 3)

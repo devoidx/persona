@@ -68,7 +68,7 @@ VETERAN_STATS = """
 
 VETERAN = """{ tracked = 6 * 3600, travel = 40 * 60, onFoot = 30 * 60, travelJumps = 400, totalJumps = 900,
   mounted = 3600, mounts = { [42] = 3000, [7] = 600 },
-  zones = { ["Bastion - Temple of Devotion"] = 2 * 3600, ["Oribos"] = 3600, ["Valdrakken"] = 1800 },
+  zones = { ["Bastion - Temple of Devotion"] = 2 * 3600, ["Oribos"] = 3600, ["Valdrakken"] = 1800, ["Bastion"] = 600 },
   idleResting = 1800, idleZones = { ["Oribos"] = 1500, ["Valdrakken"] = 300 },
   falls = 9, fallYards = 331, longestFall = 3.5,
   hours = { [1] = 3 * 3600, [20] = 3 * 3600 }, days = { [0] = 4 * 3600, [3] = 2 * 3600 },
@@ -130,8 +130,8 @@ check("Emotes", "Danced alone: once")
 ns.db.soloDances = 3
 check("Emotes", "Danced alone: 3 times")
 check("Lifetime", "Deaths: 2901 (69 from falling)", "Abandoned: 4252 (20%)", "LOLs: 0", "World's smallest violin: 0")
-check("Places", "3 places visited", "33%  Bastion - Temple of Devotion", "Where you stand around",
-      "Where you die", "75%  Oribos", "25%  Valdrakken")
+check("Places", "4 places visited", "Bastion (between places)", "Where you stand around",
+      "Where you die", "75%  Oribos", "25%  Valdrakken", absent=("Oribos (between places)", "Valdrakken (between places)"))
 ns.SetPanel(False); ns.SetPanel(True)
 assert ns.db.panelTab == "Places", "last tab remembered"
 ns.SetTab("Bogus"); assert ns.db.panelTab == "Places", "unknown tab ignored"
