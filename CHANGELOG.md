@@ -1,5 +1,10 @@
 # Persona
 
+## v0.7.5
+- Works with KillDex: if it's installed, Habits gets a Kills section and three new traits: Grudge Match, Rare Hunter and Exterminator.
+- Vanity pets are tracked on WoW: Forever too.
+- Fixed: Gravity Enthusiast, Wanderer and Stable Master could take over the title on long-played characters. They still appear, but no longer crowd out your other habits.
+
 ## v0.7.4
 - Combat pets: Old Friend for any class with a pet, plus Stable of Beasts and Lone Wolf for hunters. The Habits tab shows your combat pets and how long each one is out.
 - Fixed: time shares like "pet out" counted from before tracking started, and jumped around for the first few minutes. AFK, stealth, animal-form and pet history restart once.
