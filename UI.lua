@@ -211,6 +211,19 @@ function Tab.Habits(db, add)
     end
   end
 
+  -- Kills come from the KillDex addon, so the section only shows when it's installed
+  local kills = T.Kills()
+  if kills and kills.total > 0 then
+    add(" ")
+    add(heading() .. "Kills (from KillDex)|r")
+    add(("Kills: %s"):format(BreakUpLargeNumbers(kills.total)))
+    add(("Kinds of creature: %s"):format(BreakUpLargeNumbers(kills.kinds)))
+    if kills.rares > 0 then add(("Rares: %d"):format(kills.rares)) end
+    for i = 1, math.min(3, #kills.top) do
+      add(("%s - %s"):format(kills.top[i].k, BreakUpLargeNumbers(kills.top[i].v)))
+    end
+  end
+
   local petTime = db.petTime or 0
   if petTime > 0 then
     add(" ")

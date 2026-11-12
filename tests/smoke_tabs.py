@@ -148,5 +148,18 @@ check("Profile", "Thrall", absent=("Menace", "Watching for"))
 for tab, want in (("Habits", "No riding recorded yet."), ("Habits", "Nothing recorded yet."),
                   ("Emotes", "No emotes yet."), ("Lifetime", "no Statistics panel"),
                   ("Places", "Nowhere recorded yet.")):
-    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves", "Vanity pets", "Combat pets"))
+    check(tab, want, absent=("Bags:", "AFK:", "Where you die", "Signature moves", "Vanity pets", "Combat pets", "KillDex"))
 print("ok: brand-new character, every tab has an empty state")
+
+# 3. With the KillDex addon installed: a Kills section on Habits
+KILLDEX = """
+  KillDexCharDB = { schemaVersion = 5, mobs = {
+    [1] = { name = "Agitated Etherwyrm", kills = 124, classification = "rare" },
+    [2] = { name = "Wind Serpent", kills = 10 }, [3] = { name = "Wind Serpent", kills = 7 },
+    [4] = { name = "Venomfang Juggernaut", kills = 15 } } }
+"""
+ns, check = start(VETERAN, VETERAN_STATS + KILLDEX)
+check("Habits", "Kills (from KillDex)", "Kills: 156", "Kinds of creature: 3", "Rares: 1",
+      "Agitated Etherwyrm - 124", "Wind Serpent - 17", "Venomfang Juggernaut - 15")
+check("Profile", "Grudge Match")
+print("ok: KillDex installed: Kills section on Habits, Grudge Match on Profile")

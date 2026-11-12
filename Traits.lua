@@ -54,6 +54,29 @@ end
 
 local function pct(x) return math.floor(x * 100 + 0.5) end
 
+-- Kills, from the KillDex addon when it's installed (KillDexCharDB, per character).
+-- Its layout isn't a public API, so only the schema we've checked is read, and
+-- anything unexpected switches the kill traits off rather than guessing.
+T.KILLDEX_SCHEMA = 5
+function T.Kills()
+  local kd = rawget(_G, "KillDexCharDB")
+  if type(kd) ~= "table" or kd.schemaVersion ~= T.KILLDEX_SCHEMA or type(kd.mobs) ~= "table" then return nil end
+  local total, rares, byName = 0, 0, {}
+  for _, m in pairs(kd.mobs) do
+    if type(m) ~= "table" or type(m.kills) ~= "number" or type(m.name) ~= "string" then return nil end
+    if m.kills > 0 then
+      total = total + m.kills
+      -- Mobs that share a name (one per zone or phase) count as one
+      byName[m.name] = (byName[m.name] or 0) + m.kills
+      if m.classification == "rare" or m.classification == "rareelite" then rares = rares + 1 end
+    end
+  end
+  local top, kinds = {}, 0
+  for k, v in pairs(byName) do kinds = kinds + 1; top[#top + 1] = { k = k, v = v } end
+  table.sort(top, function(a, b) return a.v > b.v end)
+  return { total = total, kinds = kinds, rares = rares, top = top }
+end
+
 -- Time observed since a measurement started recording (see MEASURED_SINCE in
 -- Core.lua). Without this, a feature added months after install would compare
 -- an hour of data against months of observed time.
@@ -695,6 +718,40 @@ local COPY = {
       "{name} keeps the pets at home: out just {p}% of the time.",
     },
   },
+  -- Kills (from KillDex, if installed)
+  grudge = {
+    label = "Grudge Match",
+    epithet = "{name}, Bane of {mob}",
+    lines = {
+      "{name} has killed {mob} {n} times. At this point it's personal.",
+      "{p}% of everything {name} kills is {mob}. Somebody is holding a grudge.",
+      "{mob}: {n} down, and {name} isn't finished yet.",
+      "{name} and {mob} have history. {n} rounds so far, all won by {name}.",
+      "Of everything {name} could fight, {his} choice is {mob}. {n} times so far.",
+    },
+  },
+  rarehunter = {
+    label = "Rare Hunter",
+    epithet = "{name} the Tracker",
+    lines = {
+      "{name} has hunted down {n} rares. A silver dragon on the map means {name} is on the way.",
+      "{n} rares slain. {name} checks every silver dragon on the map.",
+      "Rare spawn? {name} is probably already there. {n} so far.",
+      "{name} collects rare kills the way others collect mounts: {n} so far.",
+      "{n} rare creatures have met {name}. They were rare before, and rarer now.",
+    },
+  },
+  exterminator = {
+    label = "Exterminator",
+    epithet = "{name} the Exterminator",
+    lines = {
+      "{name} has killed {n} different kinds of creature. Nothing is safe.",
+      "{n} kinds of creature and counting. {name} doesn't discriminate.",
+      "If it moves, {name} has probably killed one: {n} different kinds so far.",
+      "{name}'s kill list covers {n} different creatures. The bestiary is getting short.",
+      "{n} different creatures have fallen to {name}. Variety is the spice of life.",
+    },
+  },
   -- When they play
   nightowl = {
     label = "Night Owl",
@@ -850,6 +907,20 @@ function T.Build(db)
     if n >= m[3] then
       add(m[1], 1 + 0.25 * math.log(n / m[3]), { n = BreakUpLargeNumbers(n) })
     end
+  end
+
+  -- Kills, from KillDex if it's installed. Its history doesn't depend on how
+  -- long Persona has watched, so like the lifetime statistics it works from day
+  -- one. Counts, not time shares, so no observed-since start point is needed.
+  local kills = T.Kills()
+  if kills then
+    local first = kills.top[1]
+    if first and kills.total >= 50 and first.v / kills.total >= 0.25 then
+      local share = first.v / kills.total
+      add("grudge", share / 0.25, { mob = first.k, n = BreakUpLargeNumbers(first.v), p = pct(share) })
+    end
+    if kills.rares >= 10 then add("rarehunter", damp(kills.rares / 10), { n = kills.rares }) end
+    if kills.kinds >= 150 then add("exterminator", damp(kills.kinds / 150), { n = BreakUpLargeNumbers(kills.kinds) }) end
   end
 
   if db.tracked >= T.MIN_TRACKED then
