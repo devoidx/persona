@@ -614,6 +614,40 @@ local COPY = {
       "{n} times, {name} has escaped from an empty room.",
     },
   },
+  -- Companion pets (observed since install)
+  neveralone = {
+    label = "Never Alone",
+    epithet = "{name} and Friends",
+    lines = {
+      "{name} always brings a friend: a companion is out {p}% of the time.",
+      "{p}% of {name}'s adventures come with a tiny sidekick.",
+      "Wherever {name} goes, something small follows. {p}% of the time, anyway.",
+      "{name} never travels alone. A companion trots along {p}% of the time.",
+      "A companion is out {p}% of the time. {name} likes the company.",
+    },
+  },
+  bestfriend = {
+    label = "Best Friends",
+    epithet = "{name}, Keeper of {pet}",
+    lines = {
+      "{pet} has been at {name}'s side for {t}. The others are a bit jealous.",
+      "{name} and {pet} go everywhere together: {p}% of all companion time.",
+      "Other pets exist. {name} only has eyes for {pet}.",
+      "{pet} goes everywhere with {name}. {t} so far.",
+      "{p}% of {name}'s companion time belongs to {pet}. Inseparable.",
+    },
+  },
+  menagerie = {
+    label = "Menagerie",
+    epithet = "{name} the Zookeeper",
+    lines = {
+      "{name} has brought {n} different companions along. Nobody gets left out.",
+      "{n} companions and counting. {name} rotates them fairly.",
+      "{name} can't pick a favourite pet. {n} have had a turn so far.",
+      "A different friend every day: {n} companions out with {name} so far.",
+      "{n} companions have travelled with {name}. The stable is getting crowded.",
+    },
+  },
   -- When they play
   nightowl = {
     label = "Night Owl",
@@ -822,6 +856,22 @@ function T.Build(db)
     if stealth >= 1800 and stealth / db.tracked >= 0.1 then
       add("lurker", (stealth / db.tracked) / 0.1, { p = pct(stealth / db.tracked), t = T.FmtTime(stealth) })
     end
+
+    -- Companion pets: share of time with one out, a favourite, or sheer variety
+    local petTime = db.petTime or 0
+    if petTime / db.tracked >= 0.5 then
+      add("neveralone", (petTime / db.tracked) / 0.5, { p = pct(petTime / db.tracked) })
+    end
+    if petTime >= 3600 then
+      local species, t = top(db.pets or {})
+      if species and count(db.pets) >= 2 and t / petTime >= 0.6 then
+        local names = db.petNames or {}
+        local petName = names[species] or "a companion"
+        add("bestfriend", (t / petTime) / 0.6, { pet = petName, p = pct(t / petTime), t = T.FmtTime(t) })
+      end
+    end
+    local kinds = count(db.pets or {})
+    if kinds >= 15 then add("menagerie", 1 + 0.25 * math.log(kinds / 15), { n = kinds }) end
 
     -- Jumping while travelling
     local travelMin = db.travel / 60

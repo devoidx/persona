@@ -20,6 +20,7 @@ The panel has five tabs: **Profile** (your title and traits), **Habits**, **Emot
 | Where you die | `PLAYER_DEAD` plus current place |
 | AFK breaks | `PLAYER_FLAGS_CHANGED` plus `UnitIsAFK` |
 | Signature moves | Out-of-combat casts of a fixed list of class and racial spells (`UNIT_SPELLCAST_SUCCEEDED`), plus animal-form travel and stealth time |
+| Companion pets | Summoned companion every 5 seconds (`C_PetJournal.GetSummonedPetGUID`), by species, with your custom name if you gave one |
 | Lifetime habits | Statistics panel (deaths, falling deaths, emotes, critters, abandoned quests) |
 
 Everything is stored per character in `PersonaDB`. No combat data is read, so it is unaffected by Midnight's secret-value restrictions.

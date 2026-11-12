@@ -99,3 +99,16 @@ for tid, texts in phrasings.items():
         assert text.count("minute") <= 1, f"{tid}: unit repeated: {text}"
     assert len(texts) == 5, f"{tid}: expected 5 phrasings, saw {len(texts)}"
 print(f"ok: {len(phrasings)} traits x 5 phrasings all render cleanly ({sum(map(len, phrasings.values()))} lines)")
+
+# Companion traits
+got = build_with(petTime=0, pets=lua.table(), petNames=lua.table())
+assert not {"neveralone", "bestfriend", "menagerie"} & set(got), got
+pets = lua.eval("{ [1] = 2 * 3600, [2] = 1800 }"); names = lua.eval('{ [1] = "Mr Whiskers", [2] = "Bob" }')
+got = build_with(tracked=5 * 3600, petTime=2.5 * 3600, pets=pets, petNames=names)
+assert "neveralone" in got and "bestfriend" in got, got
+bf = [t for t in ns.traits.Build(db).values() if t.id == "bestfriend"][0]
+assert "Mr Whiskers" in bf.text or "Mr Whiskers" in bf.epithet, bf.text
+many = lua.eval("{" + ", ".join(f"[{i}] = 60" for i in range(1, 16)) + "}")
+got = build_with(petTime=900, pets=many)
+assert "menagerie" in got and "neveralone" not in got and "bestfriend" not in got, got
+print("ok: Never Alone, Best Friends and Menagerie fire at their thresholds")

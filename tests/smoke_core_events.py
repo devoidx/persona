@@ -31,6 +31,11 @@ function UnitIsAFK() return AFK end
 NUM_BAG_SLOTS = 4
 -- backpack 16 (2 free), bag 1: 20 (full), bag 2: profession bag 30 (all free), bag 3: empty slot
 local bags = { [0] = { 16, 2, 0 }, [1] = { 20, 0, 0 }, [2] = { 30, 30, 8 }, [3] = { 0, 0, 0 } }
+PET = "BattlePet-0-1"
+C_PetJournal = {
+  GetSummonedPetGUID = function() return PET end,
+  GetPetInfoByPetID = function(guid) return 42, "Mr Whiskers", 25, 0, 0, 0, false, "Black Tabby Cat" end,
+}
 C_Container = {
   GetContainerNumSlots = function(b) return bags[b] and bags[b][1] or 0 end,
   GetContainerNumFreeSlots = function(b) local x = bags[b]; if x then return x[2], x[3] end return 0, 0 end,
@@ -71,3 +76,19 @@ lua.execute("NOW = 650");              ev("PLAYER_FLAGS_CHANGED", "player")   # 
 lua.execute("NOW = 660");              ev("PLAYER_LOGOUT", None)
 assert db.afkCount == 2 and db.afkTime == 360, (db.afkCount, db.afkTime)
 print("ok: AFK periods, other units ignored, logout while AFK")
+
+# Companion pets: credited every 5 seconds with the time since the last check
+pets_before = db.petTime
+for i in range(20):                       # 20 ticks of 0.3s = 6s
+    lua.execute(f"NOW = {1000 + i}"); core_tick = lua.eval('function() CORE.scripts.OnUpdate(CORE, 0.3) end'); core_tick()
+assert abs(db.petTime - pets_before - 5.1) < 1e-6 or abs(db.petTime - pets_before - 5.4) < 1e-6, db.petTime
+assert db.pets[42] == db.petTime and db.petNames[42] == "Mr Whiskers", "custom name preferred"
+lua.execute('PET = nil')
+before = db.petTime
+for i in range(40):
+    lua.execute(f"NOW = {2000 + i}"); core_tick()
+assert db.petTime == before, "no companion out: nothing credited"
+lua.execute('C_PetJournal = nil')
+for i in range(40):
+    lua.execute(f"NOW = {3000 + i}"); core_tick()
+print("ok: companion time and custom names; no pet or no pet journal: nothing recorded, no errors")

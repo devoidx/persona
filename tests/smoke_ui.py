@@ -125,3 +125,23 @@ tip = lua.globals().TIP
 assert tip.shown and tip.lines[1] == "Persona" and tip.lines[2] == "Thrall", list(tip.lines.values())
 leave("Persona", None); assert not tip.shown
 print("ok: minimap addons button")
+
+# Opened from the character screen: closes with it, even after being moved
+ns.db.panelPos = None
+ns.SetPanel(False); C.Show(C)
+toggle = ns.ui.toggle
+toggle.scripts["OnClick"](toggle); assert P.IsShown(P), "Persona button opens it"
+P.scripts["OnDragStart"](P); P.ClearAllPoints(P); P.SetPoint(P, "TOPLEFT", U, "TOPLEFT", 50, -50); P.scripts["OnDragStop"](P)
+C.Hide(C); assert not P.IsShown(P), "opened from the character screen: closes with it even when moved"
+
+# Opened with /persona and moved: stays when the character screen closes
+C.Show(C); ns.SetPanel(False)
+lua.globals().SlashCmdList.PERSONA("")
+assert P.IsShown(P)
+C.Hide(C); assert P.IsShown(P), "opened by command and moved: stays open"
+
+# Reopened automatically with the character screen: counts as from the character screen
+ns.SetPanel(False); ns.db.panelOpen = True
+C.Show(C); assert P.IsShown(P), "reopens with the character screen"
+C.Hide(C); assert not P.IsShown(P), "and closes with it"
+print("ok: closes with the character screen when opened from it; otherwise a moved panel stays")

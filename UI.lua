@@ -9,6 +9,7 @@ local T = ns.traits
 
 local WIDTH, PAD = 320, 14
 local panel, body, toggle, title, subtitle, tabBar
+local openedFrom   -- "character" when opened from the character screen; this session only
 local TABS = { "Profile", "Habits", "Emotes", "Lifetime", "Places", "Roster" }
 local tabButtons = {}
 -- Colour of the selected tab: Blizzard gold unless a UI skin supplies its accent (Skin.lua)
@@ -101,14 +102,15 @@ local function build()
     toggle:SetSize(80, 22)
     toggle:SetPoint("TOPRIGHT", CharacterFrame, "BOTTOMRIGHT", 0, -2)
     toggle:SetText("Persona")
-    toggle:SetScript("OnClick", function() ns.SetPanel(not panel:IsShown()) end)
+    toggle:SetScript("OnClick", function() ns.SetPanel(not panel:IsShown(), false, "character") end)
 
     CharacterFrame:HookScript("OnShow", function()
-      if ns.db and ns.db.panelOpen then ns.SetPanel(true, true) end
+      if ns.db and ns.db.panelOpen then ns.SetPanel(true, true, "character") end
     end)
-    -- Only a docked panel closes with the character frame; a moved one stays put
+    -- Closes with the character screen if it was opened from there (moved or not),
+    -- or if it's docked beside it. Opened any other way and moved, it stays.
     CharacterFrame:HookScript("OnHide", function()
-      if not (ns.db and ns.db.panelPos) then panel:Hide() end
+      if openedFrom == "character" or not (ns.db and ns.db.panelPos) then panel:Hide() end
     end)
   end
 
@@ -196,6 +198,16 @@ function Tab.Habits(db, add)
     for _, u in ipairs(used) do add(("%s: %s"):format(u.label, num(u.n))) end
     if formTravel > 0 then add(("In animal form: %s"):format(T.FmtTime(formTravel))) end
     if stealth > 0 then add(("Stealthed outside combat: %s"):format(T.FmtTime(stealth))) end
+  end
+
+  local petTime = db.petTime or 0
+  if petTime > 0 then
+    add(" ")
+    add(heading() .. "Companions|r")
+    add(("Companion out: %d%% of the time"):format(pctOf(petTime, db.tracked)))
+    for _, p in ipairs(T.TopN(db.pets or {}, 3)) do
+      add(("%s - %s"):format((db.petNames or {})[p.k] or "Companion", T.FmtTime(p.v)))
+    end
   end
 
   add(" ")
@@ -405,9 +417,11 @@ function ns.SetTab(name)
   ns.Refresh()
 end
 
-function ns.SetPanel(show, fromCharFrame)
+-- source: "character" when opened from the character screen, nil otherwise
+function ns.SetPanel(show, fromCharFrame, source)
   if not panel then return end
   if show then
+    openedFrom = source
     anchor()
     panel:Show()
     -- /played prints to chat, so only ask when the player actually opens the panel.

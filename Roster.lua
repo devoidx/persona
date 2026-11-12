@@ -27,6 +27,7 @@ local WORDS = {
   taxi = "portal-opening", summoner = "summoning", nohorse = "four-legged", lurker = "sneaky",
   dramaqueen = "dramatic", hider = "shadowy", wildrunner = "wild", rocketeer = "rocket-powered",
   camper = "outdoorsy", soarer = "high-flying", stomper = "stompy", escapee = "slippery",
+  neveralone = "sociable", menagerie = "pet-collecting",
 }
 
 local function isSecret(v) return issecretvalue ~= nil and issecretvalue(v) end

@@ -44,6 +44,9 @@ local DEFAULTS = {
   afkCount = 0,
   afkTime = 0,               -- seconds flagged AFK
   moves = {},                -- signature moves (Moves.lua), counted out of combat
+  pets = {},                 -- [speciesID] = seconds out as your companion
+  petNames = {},             -- [speciesID] = custom name if given, else species name
+  petTime = 0,               -- seconds with any companion out
   formTravel = 0,            -- seconds travelling in Travel Form / Ghost Wolf
   stealthTime = 0,           -- seconds stealthed out of combat
   emotes = {},               -- [TOKEN] = times performed, e.g. DANCE, BOW
@@ -96,6 +99,21 @@ local currentMount, lastMountScan = nil, 0
 local fallStart = nil
 local clockHour, clockDay, clockCheck = nil, nil, 0
 local bagCheck, afkSince = 0, nil
+local petAcc = 0
+local PET_EVERY = 5
+
+-- Which companion pet is out, credited with the time since the last check
+local function samplePet(seconds)
+  if not (C_PetJournal and C_PetJournal.GetSummonedPetGUID) then return end
+  local guid = C_PetJournal.GetSummonedPetGUID()
+  if not guid or isSecret(guid) then return end
+  local speciesID, customName, _, _, _, _, _, petName = C_PetJournal.GetPetInfoByPetID(guid)
+  if not speciesID or isSecret(speciesID) then return end
+  db.pets[speciesID] = (db.pets[speciesID] or 0) + seconds
+  db.petTime = db.petTime + seconds
+  local name = (customName and customName ~= "") and customName or petName
+  if name then db.petNames[speciesID] = name end
+end
 local BAG_EVERY = 60
 
 -- Fullness of the backpack and ordinary bags. Profession bags (non-zero
@@ -194,6 +212,12 @@ local function onUpdate(_, elapsed)
   if now - bagCheck >= BAG_EVERY then
     bagCheck = now
     sampleBags()
+  end
+
+  petAcc = petAcc + dt
+  if petAcc >= PET_EVERY then
+    samplePet(petAcc)
+    petAcc = 0
   end
 
   -- Local clock: refresh at most once a minute
