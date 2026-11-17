@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
       GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +44,8 @@ jobs:
           python -I tests/smoke_moves.py
           python -I tests/smoke_share.py
           python -I tests/smoke_skin.py
+          python -I tests/smoke_kelldex.py Traits.lua
+          python -I tests/smoke_flavour.py Traits.lua
 
       - uses: BigWigsMods/packager@v2
         with:

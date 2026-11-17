@@ -4,6 +4,7 @@
 ## Author: devoidx
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1779851
+## X-Wago-ID: bGoYdo60
 ## SavedVariablesPerCharacter: PersonaDB
 ## SavedVariables: PersonaAccountDB
 ## OptionalDeps: EllesmereUI
