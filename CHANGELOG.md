@@ -1,5 +1,8 @@
 # Persona
 
+## v0.7.8
+- Persona is now also available on Wago Addons.
+
 ## v0.7.7
 - Race and class flavour: some traits now have extra lines just for your race or class, mixed in with the usual phrasings.
 - Bloodthirsty starts at 10,000 kills on WoW: Forever (100,000 on retail), since every Forever character is new.
