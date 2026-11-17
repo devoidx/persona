@@ -44,7 +44,7 @@ jobs:
           python -I tests/smoke_moves.py
           python -I tests/smoke_share.py
           python -I tests/smoke_skin.py
-          python -I tests/smoke_kelldex.py Traits.lua
+          python -I tests/smoke_killdex.py Traits.lua
           python -I tests/smoke_flavour.py Traits.lua
 
       - uses: BigWigsMods/packager@v2
